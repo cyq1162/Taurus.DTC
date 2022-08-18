@@ -1,0 +1,1069 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Taurus.Core</name>
+    </assembly>
+    <members>
+        <member name="T:Taurus.Core.AppSettings">
+            <summary>
+            Taurus 默认可以设置的配置项
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.AppSettings.Controllers">
+            <summary>
+            指定控制器(控制器所在的项目名称) 如 Taurus.Controllers : Taurus.Controllers
+            默认值：Taurus.Controllers
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.AppSettings.IsStartDoc">
+            <summary>
+            配置是否启用WebAPI文档自动生成功能 如 Taurus.IsStartDoc ：true
+            默认值：false
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.AppSettings.Auth">
+            <summary>
+            配置则启用默认的Token机制 如 Taurus.Auth :{TableName:用户表名,UserName:用户名字段名,Password:密码字段名,TokenExpireTime:24}
+            可配置的映射字段：TableName,UserName,Password(这三个必填写，后面可选）,FullName,Status,PasswordExpireTime,Email,Mobile,RoleID,TokenExpireTime(这个是配置小时）
+            默认值：无
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.AppSettings.Suffix">
+            <summary>
+            配置请求路径的默认后缀 如 Taurus.Suffix : .html
+            默认值：空
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.AppSettings.RouteMode">
+             <summary>
+             配置路由模式 如 Taurus.RouteMode : 1
+            值为0：匹配{Action}/{Para}
+            值为1：匹配{Controller}/{Action}/{Para}
+            值为2：匹配{Module}/{Controller}/{Action}/{Para}
+            默认值：1
+             </summary>
+        </member>
+        <member name="F:Taurus.Core.AppSettings.DefaultUrl">
+            <summary>
+            配置页面起始访问路径 如 Taurus.DefaultUrl ： home/index
+            默认值：无
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.AppSettings.IsAllowCORS">
+            <summary>
+            配置是否允许JS跨域请求 如 Taurus.IsAllowCORS ： false
+            默认值：true
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.AppSettings.SubAppName">
+            <summary>
+            配置部署成子应用程序的名称 如 Taurus.SubAppName ： UI
+            默认值：无
+            </summary>
+        </member>
+        <member name="T:Taurus.Core.AuthController">
+            <summary>
+            用户授权 WebAPI端
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.AuthController.GetToken(System.String,System.String)">
+            <summary>
+            获取Token
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.AuthController.CheckToken(Taurus.Core.IController)">
+            <summary>
+            默认检测Token的方法。
+            </summary>
+            <param name="controller"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Taurus.Core.AuthHelper">
+            <summary>
+            用户授权 MVC端的全局方法
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.AuthHelper.#cctor">
+            <summary>
+            初始化配置
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.AuthHelper.GetAuthToken(System.String,System.String,System.String@)">
+            <summary>
+            获取授权Token（手机APP登陆调用此方法获取Token为登陆凭证）
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.AuthHelper.Login(System.String,System.String,System.String@)">
+            <summary>
+            用户登陆
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.AuthHelper.Reg(System.String,System.String,System.String@)">
+            <summary>
+            用户注册
+            </summary>
+            <param name="msg">成功时返回主键ID，失败时返回错误信息</param>
+            <returns></returns>
+        </member>
+        <member name="M:Taurus.Core.AuthHelper.ChangePassword(System.String)">
+            <summary>
+            修改密码
+            </summary>
+            <param name="password"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Taurus.Core.AuthHelper.Logout">
+            <summary>
+            退出
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.AuthHelper.TokenIsValid">
+            <summary>
+            Token是否有效
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.AuthHelper.TokenCreateTime">
+            <summary>
+            Token 创建时间
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.AuthHelper.UserName">
+            <summary>
+            获取当前登陆账号的登陆ID
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.AuthHelper.FullName">
+            <summary>
+            获取当前登陆账号的用户名称
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.AuthHelper.Role">
+            <summary>
+            用户的角色IDs
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.AuthHelper.Token">
+            <summary>
+            获取当前登陆账号的Token（先取Request，再取Cookie值）
+            </summary>
+        </member>
+        <member name="T:Taurus.Core.AuthConst">
+            <summary>
+            授权相关的信息
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.AuthConst.PasswordExpired">
+            <summary>
+            提示密码已过期
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.AuthConst.PasswordError">
+            <summary>
+            密码错误
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.AuthConst.UserNotExist">
+            <summary>
+            账号不存在
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.AuthConst.CookieTokenName">
+            <summary>
+            cookie token名称
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.AuthConst.CookieUserName">
+            <summary>
+            cookie user名称
+            </summary>
+        </member>
+        <member name="T:Taurus.Core.DocController">
+            <summary>
+            API文档生成及自动化测试接口
+            </summary>
+        </member>
+        <member name="T:Taurus.Core.DocSettings">
+            <summary>
+            为WebAPI文档自动化测试设置全局图片默认值|追加参数(其它参数设置用当前Controller控制器的SetQuery方法设置)。
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.DocSettings.DefaultImg">
+            <summary>
+            配置Doc默认文档自动提交的图片（配置相对路径）
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.DocSettings.DefaultParas">
+            <summary>
+            配置Doc默认追加的（多个以逗号分隔）参数（一般用于配置全局的请求头）
+            </summary>
+        </member>
+        <member name="T:Taurus.Core.HttpPostedFileExtend">
+            <summary>
+            创建HttpPostedFile文件扩展类(为实现DocController自动化测试实现的功能)
+            </summary>
+        </member>
+        <member name="T:Taurus.Core.RequestAPI">
+            <summary>
+            记录API请求（未实现）
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.RequestAPI.Record(System.Web.HttpContext)">
+            <summary>
+            记录请求、并进行黑名单处理。
+            </summary>
+            <param name="context"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Taurus.Core.HttpResponseFilter">
+            <summary>
+            处理本项目部署成子应用程序时，多了一个目录的问题。
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.HttpResponseFilter.#ctor(System.IO.Stream)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="stream">参数为：HttpContext.Current.Response.Filter</param>
+        </member>
+        <member name="T:Taurus.Core.InvokeLogic">
+            <summary>
+            反射Controller类
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.InvokeLogic.DllNames">
+            <summary>
+            控制器名称（多个时逗号分隔）
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.InvokeLogic._Lv1Controllers">
+            <summary>
+            存档一级名称的控制器[Controller]
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.InvokeLogic._Lv2Controllers">
+            <summary>
+            存档二级名称的控制器[Module.Controller]
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.InvokeLogic.GetControllers(System.Int32)">
+            <summary>
+            获取控制器
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.InvokeLogic.GetLevelName(System.String,System.Int32)">
+            <summary>
+            存档N级名称（Module.Controller)
+            </summary>
+            <param name="fullName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Taurus.Core.InvokeLogic.GetController(System.String)">
+            <summary>
+            通过className类名获得对应的Controller类
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:Taurus.Core.InvokeLogic.GlobalDefault">
+            <summary>
+            全局Default方法
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.InvokeLogic.DefaultCheckAck">
+            <summary>
+            全局DefaultCheckAck方法
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.InvokeLogic.DefaultCheckMicroService">
+            <summary>
+            全局DefaultCheckMicroService方法
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.InvokeLogic.DefaultCheckToken">
+            <summary>
+            全局CheckToken方法
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.InvokeLogic.BeforeInvokeMethod">
+            <summary>
+             全局BeforeInvoke方法
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.InvokeLogic.RouteMapInvokeMethod">
+            <summary>
+             全局BeforeInvoke方法
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.InvokeLogic.EndInvokeMethod">
+            <summary>
+             全局EndInvokeMethod方法
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.InvokeLogic.AuthCheckToken">
+            <summary>
+            默认AuthController.CheckToken方法
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.InvokeLogic.DocRecord">
+            <summary>
+            默认DocController.Record方法(用于记录所有的请求及参数，后期实现批量执行测试结果)
+            </summary>
+        </member>
+        <member name="T:Taurus.Core.MicroService">
+            <summary>
+            微服务的核心类
+            </summary>
+            <summary>
+            微服务的核心类
+            </summary>
+            <summary>
+            微服务的核心类
+            </summary>
+            <summary>
+            微服务的核心类
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.MicroService.Version">
+            <summary>
+            获取当前Dll的版本号
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.MicroService.LogWrite(System.String,System.String,System.String,System.String)">
+            <summary>
+            内部日志记录
+            </summary>
+        </member>
+        <member name="T:Taurus.Core.MicroService.HostInfo">
+            <summary>
+            存档请求的客户端信息
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.MicroService.HostInfo.Host">
+            <summary>
+            主机地址：http://localhost:8080
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.MicroService.HostInfo.Version">
+            <summary>
+            版本号：用于版本升级。
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.MicroService.HostInfo.RegTime">
+            <summary>
+            注册时间（最新）
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.MicroService.HostInfo.CallTime">
+            <summary>
+            记录调用时间，用于隔离无法调用的服务，延时调用。
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.MicroService.HostInfo.CallIndex">
+            <summary>
+            记录调用顺序，用于负载均衡
+            </summary>
+        </member>
+        <member name="T:Taurus.Core.MicroService.IO">
+            <summary>
+            定义安全路径，防止存档数据被直接访问。
+            </summary>
+        </member>
+        <member name="T:Taurus.Core.MicroService.Server">
+            <summary>
+            网关或注册中心端编码
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.MicroService.Server.IsServer">
+            <summary>
+            当前程序是否作为服务端运行：网关或注册中心
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.MicroService.Server.IsRegCenter">
+            <summary>
+            是否注册中心
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.MicroService.Server.IsGateway">
+            <summary>
+            是否网关中心
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.MicroService.Server.IsRegCenterOfMaster">
+            <summary>
+            是否注册中心（主）
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.MicroService.Server.RegCenterIsLive">
+            <summary>
+            注册中心备份或网关 - 检测注册中心是否安在。
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.MicroService.Server.Tick">
+            <summary>
+            作为注册中心时的最后更新标识.
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.MicroService.Server.IsChange">
+            <summary>
+            注册中心 - 数据是否发生改变
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.MicroService.Server.HostListJson">
+            <summary>
+            注册中心 - 返回的表数据Json
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.MicroService.Server.Host2">
+            <summary>
+            注册中心【存档】故障转移备用链接。
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.MicroService.Server.Host2LastRegTime">
+            <summary>
+            备份链接最新注册时间
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.MicroService.Server.HostList">
+            <summary>
+            作为微服务主程序时，存档的微服务列表
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.MicroService.Server.GetHost(System.String)">
+            <summary>
+            获取模块所在的对应主机网址【若存在多个：每次获取都会循环下一个】。
+            </summary>
+            <param name="name">服务模块名称</param>
+            <returns></returns>
+        </member>
+        <member name="M:Taurus.Core.MicroService.Server.GetHostList(System.String)">
+            <summary>
+            获取模块的所有Host列表。
+            </summary>
+            <param name="name">服务模块名称</param>
+            <returns></returns>
+        </member>
+        <member name="T:Taurus.Core.MicroService.Client">
+            <summary>
+            微服务应用程序编码
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.MicroService.Client.IsClient">
+            <summary>
+            当前程序是否作为客务端运行：微服务应用程序
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.MicroService.Client.RegCenterIsLive">
+            <summary>
+            微服务应用程序 - 检测注册中心是否安在。
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.MicroService.Client.Tick">
+            <summary>
+            读取：注册中心时的最后更新标识.
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.MicroService.Client._Host2">
+            <summary>
+            读取：注册中心【存档】故障转移备用链接。
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.MicroService.Client.Host2">
+            <summary>
+            读取：从注册中心读取的备用链接
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.MicroService.Client.HostList">
+            <summary>
+            从微服务主程序端获取的微服务列表【用于微服务间内部调用运转】
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.MicroService.Client.GetHost(System.String)">
+            <summary>
+            获取模块所在的对应主机网址【若存在多个：每次获取都会循环下一个】。
+            </summary>
+            <param name="name">服务模块名称</param>
+            <returns></returns>
+        </member>
+        <member name="M:Taurus.Core.MicroService.Client.GetHostList(System.String)">
+            <summary>
+            获取模块的所有Host列表。
+            </summary>
+            <param name="name">服务模块名称</param>
+            <returns></returns>
+        </member>
+        <member name="T:Taurus.Core.MicroService.Config">
+            <summary>
+            对应【AppSettings】可配置项
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.MicroService.Config.ServerName">
+            <summary>
+            网关或注册中心配置：服务端模块名称【可配置：Gateway或RegCenter】
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.MicroService.Config.ServerRegUrl">
+            <summary>
+            网关或注册中心配置：注册中心地址【示例：http://localhost:9999】
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.MicroService.Config.ServerKey">
+            <summary>
+            网关或注册中心配置：系统间调用密钥串【任意字符串】
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.MicroService.Config.ClientKey">
+            <summary>
+            微服务应用配置：系统间调用密钥串【任意字符串】
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.MicroService.Config.ClientName">
+            <summary>
+            微服务应用配置：客户端模块名称【示例：Test】
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.MicroService.Config.ClientRegUrl">
+            <summary>
+            微服务应用配置：注册中心的Url
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.MicroService.Config.ClientVersion">
+            <summary>
+            微服务应用配置：客户端模块版本号（用于版本间升级）【示例：1】
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.MicroService.Config.AppRunUrl">
+            <summary>
+            应用配置：当前运行Url【Kestrel启动运行需要】
+            </summary>
+        </member>
+        <member name="T:Taurus.Core.MicroService.Const">
+            <summary>
+            常量
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.MicroService.Const.HeaderKey">
+            <summary>
+            请求头带上的Header的Key名称
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.MicroService.Const.Gateway">
+            <summary>
+            网关
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.MicroService.Const.RegCenter">
+            <summary>
+            注册中心
+            </summary>
+        </member>
+        <member name="T:Taurus.Core.MicroService.Run">
+            <summary>
+            运行中心
+            </summary>
+            <summary>
+            运行中心
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.MicroService.Run.Proxy(System.Web.HttpContext,System.Boolean)">
+            <summary>
+            网关代理转发方法
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.MicroService.Run.Start(System.String)">
+            <summary>
+            微服务客户端启动
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.MicroService.Run.ServerRunByLoop">
+            <summary>
+            网关、注册中心运行时。
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.MicroService.Run.ClientRunByLoop">
+            <summary>
+            微服务模块运行时。
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.MicroService.Run.RegHost">
+            <summary>
+            微服务应用中心调用：服务注册。
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Taurus.Core.MicroService.Run.RegHost2">
+            <summary>
+            （备用）注册中心调用：备用地址注册。
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Taurus.Core.MicroService.Run.SyncHostList">
+            <summary>
+            注册中心-数据同步【备用=》主机】。
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Taurus.Core.MicroService.Run.GetHostList(System.Boolean)">
+            <summary>
+            获取注册中心注册数据列表。
+            </summary>
+            <param name="isServer">请求端</param>
+        </member>
+        <member name="M:Taurus.Core.MicroService.Run.ClearServerTable">
+            <summary>
+            清理服务主机。
+            </summary>
+        </member>
+        <member name="T:Taurus.Core.MicroServiceAttribute">
+            <summary>
+            微服务标识，标记后仅允许微服务间内部调用
+            </summary>
+        </member>
+        <member name="T:Taurus.Core.MicroServiceController">
+            <summary>
+            微服务 - 注册中心。
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.MicroServiceController.Reg(System.String,System.String,System.Int32)">
+            <summary>
+            注册中心 - 注册服务。
+            </summary>
+            <param name="name">服务名称，多个用逗号分隔，【可绑定域名】【模块追加版本号|号分隔。】</param>
+            <param name="host">服务的可访问地址</param>
+            <param name="version">服务的版本号【用于版本升级】</param>
+        </member>
+        <member name="M:Taurus.Core.MicroServiceController.GetList(System.Int64)">
+            <summary>
+            注册中心 - 获取服务列表。
+            </summary>
+            <param name="tick">最后获取的时间Tick，首次请求可传0</param>
+        </member>
+        <member name="M:Taurus.Core.MicroServiceController.Reg2(System.String)">
+            <summary>
+            注册中心 - 设置【从】的备用地址。
+            </summary>
+            <param name="host">地址</param>
+        </member>
+        <member name="M:Taurus.Core.MicroServiceController.SyncList(System.String,System.Int64)">
+            <summary>
+            注册中心 - 同步数据【备用=》主机】。
+            </summary>
+            <param name="json">数据</param>
+            <param name="tick">标识</param>
+        </member>
+        <member name="T:Taurus.Core.AckAttribute">
+            <summary>
+            用于效验（不需要登陆）请求来源是否合法（存在时触发CheckAck方法）
+            </summary>
+        </member>
+        <member name="T:Taurus.Core.AttributeList">
+            <summary>
+            框架内部支持的属性
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.AttributeList.HasKey(System.String)">
+            <summary>
+            是否包含指定的key
+            </summary>
+            <param name="key">token、ack、get、post、head、put、delete</param>
+            <returns></returns>
+        </member>
+        <member name="T:Taurus.Core.HttpGetAttribute">
+            <summary>
+            自动效验是否Get请求
+            </summary>
+        </member>
+        <member name="T:Taurus.Core.HttpPostAttribute">
+            <summary>
+            自动效验是否Post请求
+            </summary>
+        </member>
+        <member name="T:Taurus.Core.HttpHeadAttribute">
+            <summary>
+            自动效验是否Head请求
+            </summary>
+        </member>
+        <member name="T:Taurus.Core.HttpPutAttribute">
+            <summary>
+            自动效验是否Put请求
+            </summary>
+        </member>
+        <member name="T:Taurus.Core.HttpDeleteAttribute">
+            <summary>
+            自动效验是否Delete请求
+            </summary>
+        </member>
+        <member name="T:Taurus.Core.RegexConst">
+            <summary>
+            常用正则表达式
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.RegexConst.UserName">
+            <summary>
+            账号
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.RegexConst.Mobile">
+            <summary>
+            手机号
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.RegexConst.MobileOrLen4">
+            <summary>
+            手机号或者手机后4位
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.RegexConst.Chinese">
+            <summary>
+            中文
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.RegexConst.IDCard">
+            <summary>
+            身份证
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.RegexConst.PostalCode">
+            <summary>
+            邮编
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.RegexConst.IP">
+            <summary>
+            IP4地址
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.RegexConst.VerifyCode">
+            <summary>
+            验证码
+            </summary>
+        </member>
+        <member name="T:Taurus.Core.RequireAttribute">
+            <summary>
+            自动较验参是否必填、正则验证
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.RequireAttribute.#ctor(System.String)">
+            <summary>
+            验证参数
+            </summary>
+            <param name="paraName">参数名称</param>
+        </member>
+        <member name="M:Taurus.Core.RequireAttribute.#ctor(System.String,System.String)">
+            <summary>
+            验证参数
+            </summary>
+            <param name="paraName">参数名称</param>
+            <param name="cnParaName">输出的参数提示名</param>
+        </member>
+        <member name="M:Taurus.Core.RequireAttribute.#ctor(System.String,System.Boolean,System.String)">
+            <param name="isRequired">是否必填</param>
+            <param name="regex">正则</param>
+        </member>
+        <member name="M:Taurus.Core.RequireAttribute.#ctor(System.String,System.Boolean,System.String,System.String)">
+            <param name="cnParaName">输出的参数提示名</param>
+        </member>
+        <member name="M:Taurus.Core.RequireAttribute.#ctor(System.String,System.Boolean,System.String,System.String,System.String)">
+            <param name="emptyTip">为空时的提示</param>
+            <param name="regexTip">正则验证失败时的提示</param>
+        </member>
+        <member name="T:Taurus.Core.TokenAttribute">
+            <summary>
+            用于效验（需要登陆）身份是否合法（存在时触发CheckToken方法）
+            </summary>
+        </member>
+        <member name="T:Taurus.Core.Controller">
+            <summary>
+            the base of Controller
+            <para>控制器基类</para>
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.Controller.APIResult">
+            <summary>
+            获取待发送的缓冲区的数据
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.Controller.CancelInvoke">
+            <summary>
+            to stop invoke method
+            <para>取消继续调用事件（可以在重载BeforeInvoke方法内使用）</para>
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.Controller.CancelLoadHtml">
+            <summary>
+            to stop load view html
+            <para>是否取消加载Html文件</para>
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.Controller.WriteLog(System.String)">
+            <summary>
+            Write log to txt
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.Controller.CheckToken">
+            <summary>
+            if the result is false will stop invoke method
+            <para>检测身份是否通过</para>
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Taurus.Core.Controller.CheckAck">
+            <summary>
+            if the result is false will stop invoke method
+            <para>检测请求是否合法</para>
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Taurus.Core.Controller.CheckMicroService">
+            <summary>
+            if the result is false will stop invoke method
+            <para>检测微服务间的请求是否合法</para>
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Taurus.Core.Controller.IsClick(System.String)">
+            <summary>
+            is button event
+            <para>是否点击了某事件</para>
+            </summary>
+            <param name="btnName">button name<para>按钮名称</para></param>
+        </member>
+        <member name="P:Taurus.Core.Controller.View">
+            <summary>
+            the View Engine
+            <para>视图模板引擎</para>
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.Controller.Module">
+            <summary>
+            请求路径中的：模块名称。
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.Controller.ControllerName">
+            <summary>
+            请求路径中的：控制器名称。
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.Controller.ControllerType">
+            <summary>
+            Controller Type
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.Controller.Action">
+            <summary>
+            请求路径中的：方法名称。
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.Controller.Para">
+             <summary>
+            请求路径中的：参数的第一个值。
+             </summary>
+        </member>
+        <member name="P:Taurus.Core.Controller.PageIndex">
+            <summary>
+            request["page"]
+            <para>datagrid分页的第N页</para>
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.Controller.PageSize">
+            <summary>
+            request["rows"]
+            <para>datagrid分页的每页N条</para>
+            </summary>
+        </member>
+        <member name="F:Taurus.Core.Controller.queryCache">
+            <summary>
+            缓存参数值，内部字典（Query方法可查。）
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.Controller.Query``1(System.Enum)">
+            <summary>
+            Get Request value
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.Controller.SetQuery(System.String,System.String)">
+            <summary>
+            自己构造请求参数(Query方法可查，优先级最高）
+            </summary>
+            <param name="name">名称</param>
+            <param name="value">请求值</param>
+        </member>
+        <member name="M:Taurus.Core.Controller.Write(System.String)">
+            <summary>
+            Write String result
+            <para> 输出原始msg的数据</para>
+            </summary>
+            <param name="msg">message<para>消息内容</para></param>
+        </member>
+        <member name="M:Taurus.Core.Controller.Write(System.String,System.Boolean)">
+            <summary>
+            Write Json result
+            <para>输出Json格式的数据</para>
+            </summary>
+            <param name="isSuccess">success or not</param>
+        </member>
+        <member name="M:Taurus.Core.Controller.Write(System.Object)">
+            <summary>
+            Write Json result
+            <para>传进对象时，会自动将对象转Json</para>
+            </summary>
+            <param name="obj">any obj is ok<para>对象或支持IEnumerable接口的对象列表</para></param>
+        </member>
+        <member name="M:Taurus.Core.Controller.GetEntity``1">
+            <summary>
+            Get entity from post form
+            <para>从Post过来的数据中获得实体类型的转换</para>
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Taurus.Core.Controller.GetJson">
+            <summary>
+            获取Get或Post的数据并转换为Json格式。
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:Taurus.Core.IController.APIResult">
+            <summary>
+            缓存Write方法输出的结果，用于最后输出
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.IController.PageIndex">
+            <summary>
+            获取参数:page
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.IController.PageSize">
+            <summary>
+            获取参数:rows
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.IController.Query``1(System.Enum)">
+            <summary>
+            获取参数方法
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.IController.GetEntity``1">
+            <summary>
+            从Post过来的数据中获得实体类型的转换
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.IController.View">
+            <summary>
+            MVC 的视图引擎
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.IController.Module">
+            <summary>
+            路由：模块参数
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.IController.ControllerName">
+            <summary>
+            路由：控制器参数
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.IController.Action">
+            <summary>
+            路由：方法参数
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.IController.Para">
+            <summary>
+            路由：第一个参数
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.IController.Write(System.String)">
+            <summary>
+            输出结果
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.IController.GetJson">
+            <summary>
+            获取Post请求，非标准请求头时，从数据流读取请求数据。
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Taurus.Core.RouteConfig">
+            <summary>
+            路由系统
+            </summary>
+        </member>
+        <member name="P:Taurus.Core.RouteConfig.RouteMode">
+            <summary>
+            配置模式【值为0,1或2】[默认为1]
+            值为0：匹配{Action}/{Para}
+            值为1：匹配{Controller}/{Action}/{Para}
+            值为2：匹配{Module}/{Controller}/{Action}/{Para}
+            </summary>
+        </member>
+        <member name="T:Taurus.Core.ViewEngine">
+            <summary>
+            视图引擎
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.ViewEngine.Create(System.String,System.String)">
+            <summary>
+            创建视图对象
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.ViewEngine.Create(System.String)">
+            <summary>
+            创建视图对象
+            </summary>
+            <param name="path">相对路径，如：/abc/cyq/a.html</param>
+        </member>
+        <member name="M:Taurus.Core.ViewEngine.GetSharedView(System.String,System.String)">
+            <summary>
+            获取Shared文件View
+            </summary>
+            <param name="htmlName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Taurus.Core.QueryTool.IsCallMicroServiceReg(System.Uri)">
+            <summary>
+            是否请求微服务注册中心
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Taurus.Core.QueryTool.IsCallMvc(System.Uri)">
+            <summary>
+            是否常规走MVC调用流程
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Taurus.Core.QueryTool.IsSubAppSite(System.Uri)">
+            <summary>
+            是否使用子目录部署网站
+            </summary>
+        </member>
+        <member name="M:Taurus.Core.QueryTool.FilterValue(System.String)">
+            <summary>
+            过滤一般的字符串
+            </summary>
+            <param name="strFilter"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Taurus.Core.SessionHandler">
+            <summary>
+            实现IHttpModule中使用Session
+            </summary>
+        </member>
+        <member name="T:Taurus.Core.UrlRewrite">
+            <summary>
+            权限检测模块（NetCore 下处理成单例模式）
+            </summary>
+        </member>
+        <member name="T:Microsoft.AspNetCore.Http.TaurusMiddleware">
+            <summary>
+            为支持Asp.net core 存在的文件
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.Http.TaurusExtensions.UseTaurusMvc(Microsoft.AspNetCore.Builder.IApplicationBuilder,System.Object)">
+            <summary>
+            Net Core 3.1 把IHostingEnvironment 拆分成了：IWebHostEnvironment和IHostEnvironment 
+            所以增加重载方法适应。
+            </summary>
+            <param name="builder"></param>
+            <param name="env"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
