@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taurus.DTC.Client.Rabbit-Demo", "Taurus.DTC.Client.Rabbit-Demo\Taurus.DTC.Client.Rabbit-Demo.csproj", "{9377F535-F511-4EA8-8E9A-CD8488E16BB3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taurus.DTC.Server.Rabbit-Demo", "Taurus.DTC.Server.Rabbit-Demo\Taurus.DTC.Server.Rabbit-Demo.csproj", "{71493851-C358-44FC-8220-C562E1DF318B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9377F535-F511-4EA8-8E9A-CD8488E16BB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9377F535-F511-4EA8-8E9A-CD8488E16BB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9377F535-F511-4EA8-8E9A-CD8488E16BB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9377F535-F511-4EA8-8E9A-CD8488E16BB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71493851-C358-44FC-8220-C562E1DF318B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71493851-C358-44FC-8220-C562E1DF318B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71493851-C358-44FC-8220-C562E1DF318B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71493851-C358-44FC-8220-C562E1DF318B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BF8662A8-8A92-4820-9909-1A68809201DF}
+	EndGlobalSection
+EndGlobal
