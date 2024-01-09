@@ -3,10 +3,10 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>Taurus.DTC</AssemblyName>
-    <AssemblyVersion>3.2.0.0</AssemblyVersion>
-    <FileVersion>3.2.0.0</FileVersion>
+    <AssemblyVersion>3.2.0.2</AssemblyVersion>
+    <FileVersion>3.2.0.2</FileVersion>
     <Authors>路过秋天</Authors>
-    <Company>路过秋天 （2024-01-09）</Company>
+    <Company>路过秋天 （2024-01-10）</Company>
     <Copyright>Copyright ©  路过秋天 2024-2124</Copyright>
 	  <AssemblyTitle>Taurus.DTC 分布式事务框架 .Net Core 版本</AssemblyTitle>
     <Product>Taurus.DTC 分布式事务框架 .NET Core 版本</Product>
@@ -22,12 +22,15 @@
   <ItemGroup>
     <Compile Remove="MQ\Kafka\DotNet\**" />
     <Compile Remove="MQ\Rabbit\DotNet\**" />
+    <Compile Remove="packages\**" />
     <Compile Remove="Properties\**" />
     <EmbeddedResource Remove="MQ\Kafka\DotNet\**" />
     <EmbeddedResource Remove="MQ\Rabbit\DotNet\**" />
+    <EmbeddedResource Remove="packages\**" />
     <EmbeddedResource Remove="Properties\**" />
     <None Remove="MQ\Kafka\DotNet\**" />
     <None Remove="MQ\Rabbit\DotNet\**" />
+    <None Remove="packages\**" />
     <None Remove="Properties\**" />
   </ItemGroup>
 

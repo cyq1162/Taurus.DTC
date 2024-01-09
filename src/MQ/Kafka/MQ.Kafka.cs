@@ -1,5 +1,6 @@
 ﻿using Confluent.Kafka;
 using Confluent.Kafka.Admin;
+using CYQ.Data.Tool;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -9,6 +10,66 @@ namespace Taurus.Plugin.DistributedTransaction
 
     internal class MQKafka : MQ
     {
+        #region 错误链接断开重连机制处理
+
+        MDictionary<string, ListenPara> listenFailDic = new MDictionary<string, ListenPara>(StringComparer.OrdinalIgnoreCase);
+        private bool _IsListenOK = false;
+        private object lockObj = new object();
+        private bool isThreadWorking = false;
+        private void TryConnect()
+        {
+            if (isThreadWorking) { return; }
+            lock (lockObj)
+            {
+                if (isThreadWorking) { return; }
+                isThreadWorking = true;
+                ThreadPool.QueueUserWorkItem(new WaitCallback(ConnectAgain), null);
+            }
+        }
+
+        private void ConnectAgain(object p)
+        {
+            if (_IsListenOK) { return; }
+            while (true)
+            {
+                Thread.Sleep(5000);
+                try
+                {
+                    //重新开启监听，只有监听是需要确认监听调用起来的，监听开启后的故障，由Confluent.Kafka内部处理。
+                    if (listenFailDic.Count > 0)
+                    {
+                        List<string> keys = listenFailDic.GetKeys();
+                        foreach (string key in keys)
+                        {
+                            ListenPara para = listenFailDic[key];
+                            _IsListenOK = Listen(key, para.Event, null);
+                            if (_IsListenOK)
+                            {
+                                listenFailDic.Remove(key);
+                            }
+                            else
+                            {
+                                //有一个失败，等下一次5秒循环。
+                                break;
+                            }
+                        }
+                    }
+                    if (listenFailDic.Count == 0)
+                    {
+                        isThreadWorking = false;
+                        break;
+                    }
+                }
+                catch
+                {
+
+                }
+
+            }
+
+        }
+        #endregion
+
         public override MQType MQType
         {
             get
@@ -16,12 +77,11 @@ namespace Taurus.Plugin.DistributedTransaction
                 return MQType.Kafka;
             }
         }
-        bool isClient = false;
+
         string servers = string.Empty;
         public MQKafka(string mqConn, bool isClient)
         {
             servers = mqConn;
-            this.isClient = isClient;
         }
 
         public override bool Publish(MQMsg msg)
@@ -32,6 +92,7 @@ namespace Taurus.Plugin.DistributedTransaction
                 {
                     return false;
                 }
+                if (!_IsListenOK) { return false; }
                 var config = new ProducerConfig
                 {
                     BootstrapServers = servers,
@@ -70,6 +131,7 @@ namespace Taurus.Plugin.DistributedTransaction
             if (msgList == null || msgList.Count == 0) { return false; }
             try
             {
+                if (!_IsListenOK) { return false; }
                 var config = new ProducerConfig
                 {
                     BootstrapServers = servers,
@@ -106,19 +168,29 @@ namespace Taurus.Plugin.DistributedTransaction
                 return false;
             }
         }
+
         public override bool Listen(string topic, OnReceivedDelegate onReceivedDelegate, string exName)
         {
             if (string.IsNullOrEmpty(topic) || onReceivedDelegate == null)
             {
                 return false;
             }
+            if (!listenFailDic.ContainsKey(topic))
+            {
+                listenFailDic.Add(topic, new ListenPara() { Event = onReceivedDelegate });
+            }
             try
             {
                 if (CreateTopicIfNoExists(topic))
                 {
-                    ListenPara para = new ListenPara() { Topic = topic, OnReceivedDelegate = onReceivedDelegate };
+                    ListenPara para = new ListenPara() { Topic = topic, Event = onReceivedDelegate };
                     ThreadPool.QueueUserWorkItem(new WaitCallback(ListenThread), para);
                     return true;
+                }
+                else
+                {
+                    _IsListenOK = false;
+                    TryConnect();
                 }
             }
             catch (Exception err)
@@ -128,20 +200,7 @@ namespace Taurus.Plugin.DistributedTransaction
             return false;
         }
 
-        private void OnReceive(object topicObj)
-        {
-            ListenPara para = topicObj as ListenPara;
-            MQMsg msg = MQMsg.Create(para.Message);
 
-            //反转队列名称和监听key
-            msg.QueueName = msg.CallBackName;
-            msg.CallBackName = para.Topic;
-
-            string subKey = msg.TaskKey;
-            msg.TaskKey = msg.CallBackKey;
-            msg.CallBackKey = subKey;
-            para.OnReceivedDelegate(msg);
-        }
         private void ListenThread(object topicObj)
         {
             ListenPara para = topicObj as ListenPara;
@@ -157,7 +216,7 @@ namespace Taurus.Plugin.DistributedTransaction
                 using (var consumer = new ConsumerBuilder<Ignore, string>(config).Build())
                 {
                     consumer.Subscribe(para.Topic);
-
+                    listenFailDic.Remove(para.Topic);
                     while (true)
                     {
                         try
@@ -168,6 +227,8 @@ namespace Taurus.Plugin.DistributedTransaction
                         }
                         catch (Exception err)
                         {
+                            listenFailDic.Add(para.Topic, para);
+                            TryConnect();
                             CYQ.Data.Log.Write(err, "MQ.Kafka");
                         }
                     }
@@ -180,6 +241,21 @@ namespace Taurus.Plugin.DistributedTransaction
                 CYQ.Data.Log.Write(err, "MQ.Kafka");
             }
 
+        }
+
+        private void OnReceive(object topicObj)
+        {
+            ListenPara para = topicObj as ListenPara;
+            MQMsg msg = MQMsg.Create(para.Message);
+
+            //反转队列名称和监听key
+            msg.QueueName = msg.CallBackName;
+            msg.CallBackName = para.Topic;
+
+            string subKey = msg.TaskKey;
+            msg.TaskKey = msg.CallBackKey;
+            msg.CallBackKey = subKey;
+            para.Event(msg);
         }
 
         /// <summary>
@@ -250,7 +326,7 @@ namespace Taurus.Plugin.DistributedTransaction
         {
             public string Topic { get; set; }
             public string Message { get; set; }
-            public OnReceivedDelegate OnReceivedDelegate { get; set; }
+            public OnReceivedDelegate Event { get; set; }
         }
     }
 
