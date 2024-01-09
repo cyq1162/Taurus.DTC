@@ -252,7 +252,7 @@ namespace Taurus.Plugin.DistributedTransaction
                             object obj = method.IsStatic ? null : Activator.CreateInstance(method.DeclaringType);
                             object invokeResult = method.Invoke(obj, new object[] { para });
                             if (invokeResult is bool && !(bool)invokeResult) { return; }
-                            DTCLog.WriteDebugLine("Server.OnCommitOrRollBack 执行方法：。" + method.Name);
+                            //DTCLog.WriteDebugLine("Server.OnCommitOrRollBack 执行方法：。" + method.Name);
                         }
                         catch (Exception err)
                         {
@@ -285,7 +285,7 @@ namespace Taurus.Plugin.DistributedTransaction
                             isUpdateOK = table.Update();
                             if (isUpdateOK)
                             {
-                                DTCLog.WriteDebugLine("Client.OnCommitOrRollBack 更新状态。");
+                                //DTCLog.WriteDebugLine("Client.OnCommitOrRollBack 更新状态。");
                             }
                         }
                         else if (!table.Content.Contains(msg.MsgID))

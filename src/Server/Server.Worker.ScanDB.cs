@@ -135,7 +135,7 @@ namespace Taurus.Plugin.DistributedTransaction
                                 }
                                 if (MQ.Client.PublishBatch(msgList))
                                 {
-                                    Debug.WriteLine("Server.ScanDB 已从数据库扫描批量发送到MQ队列：" + msgList.Count);
+                                    DTCLog.WriteDebugLine("Server.ScanDB 已从数据库扫描批量发送到MQ队列：" + msgList.Count);
                                     foreach (var row in dtSend.Rows)
                                     {
                                         row.Set("Retries", row.Get<int>("Retries") + 1, 2);

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CYQ.Data;
+using System;
 
 
 namespace Taurus.Plugin.DistributedTransaction
@@ -8,6 +9,21 @@ namespace Taurus.Plugin.DistributedTransaction
     /// </summary>
     public partial class DTC
     {
+        private static string _Version;
+        /// <summary>
+        /// 获取当前 Taurus 版本号
+        /// </summary>
+        internal static string Version
+        {
+            get
+            {
+                if (_Version == null)
+                {
+                    _Version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                }
+                return _Version;
+            }
+        }
         public static partial class Client
         {
             /// <summary>
@@ -17,7 +33,7 @@ namespace Taurus.Plugin.DistributedTransaction
             {
                 if (DTCConfig.Client.IsEnable)
                 {
-                    DTCLog.WriteDebugLine("DTC.Client.Start = true");
+                    DTCLog.WriteDebugLine("DTC.Client.Start = true , Version = "+ Version);
                     DTC.Client.Worker.DBScanner.Start();
                 }
             }
@@ -30,7 +46,7 @@ namespace Taurus.Plugin.DistributedTransaction
             {
                 if (DTCConfig.Server.IsEnable)
                 {
-                    DTCLog.WriteDebugLine("DTC.Server.Start = true");
+                    DTCLog.WriteDebugLine("DTC.Server.Start = true , Version = "+ Version);
                     DTC.Server.Worker.DBScanner.Start();
                 }
             }

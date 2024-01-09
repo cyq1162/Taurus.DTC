@@ -5,12 +5,12 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{41BA3881-AB5C-4F80-A880-7274937AA99B}</ProjectGuid>
+    <ProjectGuid>{0B537946-1A70-415A-815F-C1D8CD49788C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Taurus.Plugin.DistributedTransaction</RootNamespace>
     <AssemblyName>Taurus.DTC</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
@@ -20,7 +20,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin\Rabbit\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -29,16 +29,14 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin\Rabbit\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <DocumentationFile>bin\Rabbit\Release\Taurus.DTC.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Confluent.Kafka, Version=1.8.2.0, Culture=neutral, PublicKeyToken=12c514ca49093d1e, processorArchitecture=MSIL">
-      <HintPath>packages\Confluent.Kafka.1.8.2\lib\net45\Confluent.Kafka.dll</HintPath>
-    </Reference>
     <Reference Include="CYQ.Data, Version=5.9.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\cyqdata.5.9.0\lib\net40\CYQ.Data.dll</HintPath>
     </Reference>
@@ -77,7 +75,7 @@
     <Compile Include="DTCLog.cs" />
     <Compile Include="Enum\ExeTypeEnum.cs" />
     <Compile Include="Enum\TableClearMode.cs" />
-    <Compile Include="MQ\Kafka\MQ.Kafka.cs" />
+    <Compile Include="MQ\Kafka\MQ.Kafka.NoSupport.cs" />
     <Compile Include="MQ\MQ.cs" />
     <Compile Include="MQ\MQMsg.cs" />
     <Compile Include="MQ\Rabbit\DotNet\MQ.Rabbit.cs" />

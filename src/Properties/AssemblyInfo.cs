@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Taurus.DTC 分布式事务框架 .Net 版本")]
 [assembly: AssemblyDescription("Taurus.DTC 是一款用于分布事务的框架，支持.Net和.Net Core 双系列版本")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("路过秋天 （2024-01-07）")]
+[assembly: AssemblyCompany("路过秋天 （2024-01-09）")]
 [assembly: AssemblyProduct("Taurus.DTC 分布式事务框架 .NET 版本")]
 [assembly: AssemblyCopyright("版权所有 (C) 路过秋天 2024-2124")]
 [assembly: AssemblyTrademark("Taurus.DTC")]
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // 可以指定所有这些值，也可以使用“生成号”和“修订号”的默认值，
 // 方法是按如下所示使用“*”:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.1.0.0")]
-[assembly: AssemblyFileVersion("1.1.0.0")]
+[assembly: AssemblyVersion("3.2.0.0")]
+[assembly: AssemblyFileVersion("3.2.0.0")]
