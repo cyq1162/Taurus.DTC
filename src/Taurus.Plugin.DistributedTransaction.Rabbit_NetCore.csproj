@@ -16,27 +16,38 @@
     <PackageId>Taurus.DTC</PackageId>
     <Version>3.2.0</Version>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <BaseOutputPath>bin\rabbit\</BaseOutputPath>
+    <BaseIntermediateOutputPath>obj\rabbit\</BaseIntermediateOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="MQ\Kafka\DotNet\**" />
+    <Compile Remove="bin\**" />
+    <Compile Remove="MQ\Kafka\**" />
     <Compile Remove="MQ\Rabbit\DotNet\**" />
+    <Compile Remove="obj\**" />
     <Compile Remove="Properties\**" />
-    <EmbeddedResource Remove="MQ\Kafka\DotNet\**" />
+    <EmbeddedResource Remove="bin\**" />
+    <EmbeddedResource Remove="MQ\Kafka\**" />
     <EmbeddedResource Remove="MQ\Rabbit\DotNet\**" />
+    <EmbeddedResource Remove="obj\**" />
     <EmbeddedResource Remove="Properties\**" />
-    <None Remove="MQ\Kafka\DotNet\**" />
+    <None Remove="bin\**" />
+    <None Remove="MQ\Kafka\**" />
     <None Remove="MQ\Rabbit\DotNet\**" />
+    <None Remove="obj\**" />
     <None Remove="Properties\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="MQ\Kafka\MQ.Kafka.NoSupport.cs" />
     <Compile Remove="MQ\Rabbit\MQ.Rabbit.NoSupport.cs" />
+    <Compile Remove="MQ\Rabbit\NetCore\MQ.Rabbit.NoSupport.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Confluent.Kafka" Version="2.3.0" />
+    <Compile Include="MQ\Kafka\MQ.Kafka.NoSupport.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="cyqdatacore" Version="5.9.0" />
     <PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
   </ItemGroup>
