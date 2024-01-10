@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>Taurus.DTC</AssemblyName>
-    <AssemblyVersion>3.2.0.2</AssemblyVersion>
-    <FileVersion>3.2.0.2</FileVersion>
+    <AssemblyVersion>3.2.1</AssemblyVersion>
+    <FileVersion>3.2.1</FileVersion>
     <Authors>路过秋天</Authors>
     <Company>路过秋天 （2024-01-10）</Company>
     <Copyright>Copyright ©  路过秋天 2024-2124</Copyright>
