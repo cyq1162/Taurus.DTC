@@ -61,7 +61,8 @@ namespace Taurus.Plugin.DistributedTransaction
                                     {
                                         if (MQ.Client.PublishBatch(mQMsgs))
                                         {
-                                            Debug.WriteLine("Client 批量发布MQ信息：" + mQMsgs.Count + "条。");
+                                            Log.Print("MQ.Publish : " + mQMsgs.Count + " items.");
+                                            DTCConsole.WriteDebugLine("Client.MQ.Publish : " + mQMsgs.Count + " items.");
                                         }
                                         mQMsgs.Clear();
                                     }
@@ -82,7 +83,7 @@ namespace Taurus.Plugin.DistributedTransaction
                         {
                             threadIsWorking = false;
                             //数据库异常，不处理。
-                            Log.Write(err, "DTC-Client");
+                            Log.Error(err);
                         }
                     }
 
@@ -93,11 +94,11 @@ namespace Taurus.Plugin.DistributedTransaction
                         {
                             //对默认对列绑定交换机。
                             bool isOK = MQ.Client.Listen(DTCConfig.Client.MQ.DefaultQueue, Client.OnReceived, DTCConfig.Client.MQ.DefaultExChange);
-                            DTCLog.WriteDebugLine("DTC.Client." + mq.MQType + ".Listen : " + DTCConfig.Client.MQ.DefaultQueue + (isOK ? " - OK." : " - Fail."));
+                            DTCConsole.WriteDebugLine("DTC.Client." + mq.MQType + ".Listen : " + DTCConfig.Client.MQ.DefaultQueue + (isOK ? " - OK." : " - Fail."));
                             isOK = MQ.Client.Listen(DTCConfig.Client.MQ.RetryQueue, Client.OnReceived, DTCConfig.Client.MQ.RetryExChange);
-                            DTCLog.WriteDebugLine("DTC.Client." + mq.MQType + ".Listen : " + DTCConfig.Client.MQ.RetryQueue + (isOK ? " - OK." : " - Fail."));
+                            DTCConsole.WriteDebugLine("DTC.Client." + mq.MQType + ".Listen : " + DTCConfig.Client.MQ.RetryQueue + (isOK ? " - OK." : " - Fail."));
                             isOK = MQ.Client.Listen(DTCConfig.Client.MQ.ConfirmQueue, Client.OnReceived, DTCConfig.Client.MQ.ConfirmExChange);
-                            DTCLog.WriteDebugLine("DTC.Client." + mq.MQType + ".Listen : " + DTCConfig.Client.MQ.ConfirmQueue + (isOK ? " - OK." : " - Fail."));
+                            DTCConsole.WriteDebugLine("DTC.Client." + mq.MQType + ".Listen : " + DTCConfig.Client.MQ.ConfirmQueue + (isOK ? " - OK." : " - Fail."));
                         }
                     }
                 }

@@ -33,7 +33,7 @@ namespace Taurus.Plugin.DistributedTransaction
             {
                 if (DTCConfig.Client.IsEnable)
                 {
-                    DTCLog.WriteDebugLine("DTC.Client.Start = true , Version = "+ Version);
+                    DTCConsole.WriteDebugLine("DTC.Client.Start = true , Version = "+ Version);
                     DTC.Client.Worker.DBScanner.Start();
                 }
             }
@@ -46,7 +46,7 @@ namespace Taurus.Plugin.DistributedTransaction
             {
                 if (DTCConfig.Server.IsEnable)
                 {
-                    DTCLog.WriteDebugLine("DTC.Server.Start = true , Version = "+ Version);
+                    DTCConsole.WriteDebugLine("DTC.Server.Start = true , Version = "+ Version);
                     DTC.Server.Worker.DBScanner.Start();
                 }
             }
@@ -57,10 +57,10 @@ namespace Taurus.Plugin.DistributedTransaction
         /// </summary>
         public static void Start()
         {
-            DTCLog.WriteDebugLine("--------------------------------------------------");
+            DTCConsole.WriteDebugLine("--------------------------------------------------");
             Client.Start();
             Server.Start();
-            DTCLog.WriteDebugLine("--------------------------------------------------");
+            DTCConsole.WriteDebugLine("--------------------------------------------------");
         }
     }
 

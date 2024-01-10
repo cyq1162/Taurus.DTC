@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>Taurus.DTC</AssemblyName>
-    <AssemblyVersion>3.2.0.0</AssemblyVersion>
-    <FileVersion>3.2.0.0</FileVersion>
+    <AssemblyVersion>3.2.0.2</AssemblyVersion>
+    <FileVersion>3.2.0.2</FileVersion>
     <Authors>路过秋天</Authors>
-    <Company>路过秋天 （2024-01-09）</Company>
+    <Company>路过秋天 （2024-01-10）</Company>
     <Copyright>Copyright ©  路过秋天 2024-2124</Copyright>
 	  <AssemblyTitle>Taurus.DTC 分布式事务框架 .Net Core 版本</AssemblyTitle>
     <Product>Taurus.DTC 分布式事务框架 .NET Core 版本</Product>

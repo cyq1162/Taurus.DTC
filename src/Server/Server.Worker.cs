@@ -19,6 +19,7 @@ namespace Taurus.Plugin.DistributedTransaction
                     bool result = false;
                     if (!string.IsNullOrEmpty(DTCConfig.Server.Conn) && table.Insert(InsertOp.None))
                     {
+                        Log.Print("DB.Write : " + table.ToJson());
                         result = true;
                         table.Dispose();
                     }

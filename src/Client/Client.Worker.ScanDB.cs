@@ -98,7 +98,7 @@ namespace Taurus.Plugin.DistributedTransaction
                             }
                             catch (Exception err)
                             {
-                                Log.Write(err, "DTC.Client");
+                                Log.Error(err);
                                 break;
                             }
 
@@ -131,7 +131,8 @@ namespace Taurus.Plugin.DistributedTransaction
                                 List<MQMsg> msgList = dtSend.ToList<MQMsg>();
                                 if (MQ.Client.PublishBatch(msgList))
                                 {
-                                    DTCLog.WriteDebugLine("Client.ScanDB 已从数据库扫描批量发送到 RetryExChange 队列：" + msgList.Count);
+                                    Log.Print("ScanDB.MQ.Publish.ToRetryExChange :" + msgList.Count + " items.");
+                                    DTCConsole.WriteDebugLine("Client.ScanDB.MQ.Publish.ToRetryExChange :" + msgList.Count + " items.");
                                     foreach (var row in dtSend.Rows)
                                     {
                                         row.Set("Retries", row.Get<int>("Retries") + 1, 2);
@@ -234,7 +235,8 @@ namespace Taurus.Plugin.DistributedTransaction
                             //批量发送
                             if (msgList.Count > 0 && MQ.Client.PublishBatch(msgList))
                             {
-                                DTCLog.WriteDebugLine("Client.ScanIO 批量发送到 RetryExChange 队列：" + msgList.Count);
+                                Log.Print("ScanIO.MQ.Publish.ToRetryExChange :" + msgList.Count + " items.");
+                                DTCConsole.WriteDebugLine("Client.ScanIO.MQ.Publish.ToRetryExChange :" + msgList.Count + " items.");
                             }
                         }
                     }

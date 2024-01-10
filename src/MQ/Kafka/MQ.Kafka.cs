@@ -13,7 +13,7 @@ namespace Taurus.Plugin.DistributedTransaction
         #region 错误链接断开重连机制处理
 
         MDictionary<string, ListenPara> listenFailDic = new MDictionary<string, ListenPara>(StringComparer.OrdinalIgnoreCase);
-        private bool _IsListenOK = false;
+        private bool _IsListenOK = true;
         private object lockObj = new object();
         private bool isThreadWorking = false;
         private void TryConnect()

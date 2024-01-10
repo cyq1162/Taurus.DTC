@@ -45,7 +45,8 @@ namespace Taurus.Plugin.DistributedTransaction
 
             internal static void OnReceived(MQMsg msg)
             {
-                //Debug.WriteLine("当前线程ID：" + System.Threading.Thread.CurrentThread.ManagedThreadId);
+                Log.Print("MQ.OnReceived : " + msg.ToJson());
+                DTCConsole.WriteDebugLine("Server.MQ.OnReceived : " + msg.MsgID + " - " + msg.ExeType);
                 var localLock = DistributedLock.Local;
                 string key = "DTC.Server." + msg.MsgID;
                 bool isLockOK = false;
@@ -63,7 +64,7 @@ namespace Taurus.Plugin.DistributedTransaction
                 }
                 catch (Exception err)
                 {
-                    Log.Write(err, "DTC.Server");
+                    Log.Error(err);
                 }
                 finally
                 {
@@ -73,7 +74,7 @@ namespace Taurus.Plugin.DistributedTransaction
                     }
                 }
             }
-          
+
             private static void OnDoTask(MQMsg msg)
             {
                 if (msg.IsDeleteAck.HasValue && msg.IsDeleteAck.Value)
@@ -120,11 +121,12 @@ namespace Taurus.Plugin.DistributedTransaction
                     object result = method.Invoke(obj, new object[] { para });
                     if (result is bool && !(bool)result) { return; }
                     returnContent = para.CallBackContent;
-                    //DTCLog.WriteDebugLine("Server.OnDoTask 执行方法：。" + method.Name);
+                    Log.Print("Execute." + msg.ExeType + ".Subscribe.Method : " + method.Name);
+                    DTCConsole.WriteDebugLine("Server.Execute." + msg.ExeType + ".Subscribe.Method : " + method.Name);
                 }
                 catch (Exception err)
                 {
-                    Log.Write(err.Message, "DTC.Server");
+                    Log.Error(err);
                     return;
                 }
 
@@ -204,11 +206,12 @@ namespace Taurus.Plugin.DistributedTransaction
                         object result = method.Invoke(obj, new object[] { para });
                         if (result is bool && !(bool)result) { continue; }
                         returnContent = para.CallBackContent;
-                        //DTCLog.WriteDebugLine("Server.OnCommitOrRollBack 执行方法：。" + method.Name);
+                        Log.Print("Execute." + msg.ExeType + ".Subscribe.Method : " + method.Name);
+                        DTCConsole.WriteDebugLine("Server.Execute." + msg.ExeType + ".Subscribe.Method : " + method.Name);
                     }
                     catch (Exception err)
                     {
-                        Log.Write(err.Message, "DTC.Server");
+                        Log.Error(err);
                         return;
                     }
                     msg.IsFirstAck = true;

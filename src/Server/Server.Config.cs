@@ -29,6 +29,26 @@ namespace Taurus.Plugin.DistributedTransaction
                 }
             }
 
+            /// <summary>
+            /// 配置是否 打印追踪日志，用于调试
+            /// 如 DTC.Client.IsPrintTraceLog ：true， 默认值：true
+            /// </summary>
+            public static bool IsPrintTraceLog
+            {
+                get
+                {
+#if DEBUG
+                    return AppConfig.GetAppBool("DTC.Server.IsPrintTraceLog", true);
+#else
+                    return AppConfig.GetAppBool("DTC.Server.IsPrintTraceLog", false);
+#endif
+
+                }
+                set
+                {
+                    AppConfig.SetApp("DTC.Server.IsPrintTraceLog", value.ToString());
+                }
+            }
 
             /// <summary>
             /// DTC 类记录本地消息数据库 - 数据库链接配置
@@ -38,11 +58,11 @@ namespace Taurus.Plugin.DistributedTransaction
             {
                 get
                 {
-                    return AppConfig.GetConn("DTCServerConn");
+                    return AppConfig.GetConn("DTC.Server.Conn");
                 }
                 set
                 {
-                    AppConfig.SetConn("DTCServerConn", value);
+                    AppConfig.SetConn("DTC.Server.Conn", value);
                 }
             }
 

@@ -39,10 +39,18 @@ namespace Taurus.Plugin.DistributedTransaction
                             isOK = disCache.Set(GetKey(id), json, DTCConfig.Client.Worker.TimeoutKeepSecond / 60);//写入分布式缓存
                             SetIDListWithDisLock(disCache, id, table.ExeType, true);
                         }
-                        if (!isOK)
+                        if (isOK)
+                        {
+                            Log.Print(disCache.CacheType + ".Write : " + json);
+                        }
+                        else
                         {
                             string path = AppConfig.WebRootPath + "App_Data/dtc/client/" + table.ExeType.ToLower() + "/" + id.Replace(':', '_') + ".txt";
                             isOK = IOHelper.Write(path, json);
+                            if(isOK)
+                            {
+                                Log.Print("IO.Write : " + json);
+                            }
                         }
                         return isOK;
 
@@ -121,7 +129,7 @@ namespace Taurus.Plugin.DistributedTransaction
                         if (tables.Count == 0)
                         {
                             string folder = AppConfig.WebRootPath + "App_Data/dtc/client/";
-                            if (System.IO.Directory.Exists(folder))  
+                            if (System.IO.Directory.Exists(folder))
                             {
                                 string[] files = IOHelper.GetFiles(folder, "*.txt", System.IO.SearchOption.AllDirectories);
                                 if (files != null && files.Length > 0)

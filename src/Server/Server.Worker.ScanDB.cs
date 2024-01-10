@@ -97,7 +97,7 @@ namespace Taurus.Plugin.DistributedTransaction
                             catch (Exception err)
                             {
                                 threadIsWorking = false;
-                                Log.Write(err, "DTC.Server");
+                                Log.Error(err);
                                 break;
                             }
                         }
@@ -135,7 +135,8 @@ namespace Taurus.Plugin.DistributedTransaction
                                 }
                                 if (MQ.Client.PublishBatch(msgList))
                                 {
-                                    DTCLog.WriteDebugLine("Server.ScanDB 已从数据库扫描批量发送到MQ队列：" + msgList.Count);
+                                    Log.Print("ScanDB.MQ.Publish :" + msgList.Count + " items.");
+                                    DTCConsole.WriteDebugLine("Server.ScanDB.MQ.Publish :" + msgList.Count + " items.");
                                     foreach (var row in dtSend.Rows)
                                     {
                                         row.Set("Retries", row.Get<int>("Retries") + 1, 2);

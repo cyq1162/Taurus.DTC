@@ -1,7 +1,5 @@
-﻿using CYQ.Data;
-using CYQ.Data.Json;
+﻿using CYQ.Data.Json;
 using CYQ.Data.Lock;
-using CYQ.Data.Tool;
 using System;
 using System.Reflection;
 using System.Web;
@@ -140,6 +138,8 @@ namespace Taurus.Plugin.DistributedTransaction
             /// </summary>
             internal static void OnReceived(MQMsg msg)
             {
+                Log.Print("MQ.OnReceived : " + msg.ToJson());
+                DTCConsole.WriteDebugLine("Client.MQ.OnReceived : " + msg.MsgID + " - " + msg.ExeType);
                 var localLock = DistributedLock.Local;
                 string key = "DTC.Client." + msg.MsgID;
                 bool isLockOK = false;
@@ -157,7 +157,7 @@ namespace Taurus.Plugin.DistributedTransaction
                 }
                 catch (Exception err)
                 {
-                    Log.Write(err, "DTC.Client");
+                    Log.Error(err);
                 }
                 finally
                 {
@@ -191,11 +191,12 @@ namespace Taurus.Plugin.DistributedTransaction
                             object obj = method.IsStatic ? null : Activator.CreateInstance(method.DeclaringType);
                             object invokeResult = method.Invoke(obj, new object[] { para });
                             if (invokeResult is bool && !(bool)invokeResult) { return; }
-                            //DTCLog.WriteDebugLine("Client.OnDoTask 首次执行方法：" + method.Name);
+                            Log.Print("Execute." + msg.ExeType + ".CallBack.Method : " + method.Name);
+                            DTCConsole.WriteDebugLine("Client.Execute." + msg.ExeType + ".CallBack.Method : " + method.Name);
                         }
                         catch (Exception err)
                         {
-                            Log.Write(err.Message, "DTC.Client");
+                            Log.Error(err);
                             return;
                         }
                     }
@@ -252,11 +253,12 @@ namespace Taurus.Plugin.DistributedTransaction
                             object obj = method.IsStatic ? null : Activator.CreateInstance(method.DeclaringType);
                             object invokeResult = method.Invoke(obj, new object[] { para });
                             if (invokeResult is bool && !(bool)invokeResult) { return; }
-                            //DTCLog.WriteDebugLine("Server.OnCommitOrRollBack 执行方法：。" + method.Name);
+                            Log.Print("Execute." + msg.ExeType + ".CallBack.Method : " + method.Name);
+                            DTCConsole.WriteDebugLine("Client.Execute." + msg.ExeType + ".CallBack.Method : " + method.Name);
                         }
                         catch (Exception err)
                         {
-                            Log.Write(err.Message, "DTC.Client");
+                            Log.Error(err);
                             return;
                         }
                     }

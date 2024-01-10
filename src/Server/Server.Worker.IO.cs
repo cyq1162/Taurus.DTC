@@ -38,7 +38,11 @@ namespace Taurus.Plugin.DistributedTransaction
                             isOK = disCache.Set(GetKey(table.MsgID), json, DTCConfig.Server.Worker.TimeoutKeepSecond / 60);//写入分布式缓存
                             SetTraceIDListWithDisLock(disCache, table.TraceID, table.MsgID, table.ExeType, true);//写入traceID => 多个msgID
                         }
-                        if (!isOK)
+                        if (isOK)
+                        {
+                            Log.Print(disCache.CacheType + ".Write : " + json);
+                        }
+                        else
                         {
                             string path = AppConfig.WebRootPath + "App_Data/dtc/server/";
                             if (table.ExeType == ExeType.Task.ToString())
@@ -50,6 +54,10 @@ namespace Taurus.Plugin.DistributedTransaction
                                 path += table.TraceID.Replace(':', '_') + "/" + table.MsgID + ".txt";
                             }
                             isOK = IOHelper.Write(path, json);
+                            if (isOK)
+                            {
+                                Log.Print("IO.Write : " + json);
+                            }
                         }
                         return isOK;
 
@@ -185,7 +193,7 @@ namespace Taurus.Plugin.DistributedTransaction
                             }
                             catch (Exception err)
                             {
-                                Log.Write(err, "DTC.Server");
+                                Log.Error(err);
                             }
                         }
                     }
@@ -219,7 +227,7 @@ namespace Taurus.Plugin.DistributedTransaction
                             }
                             catch (Exception err)
                             {
-                                Log.Write(err, "DTC.Server");
+                                Log.Error(err);
                             }
                         }
                     }
