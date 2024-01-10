@@ -65,6 +65,7 @@
     <Compile Include="Attribute\DTCServerSubscribePara.cs" />
     <Compile Include="Client\Client.Config.cs" />
     <Compile Include="Client\Client.cs" />
+    <Compile Include="Client\Client.Log.cs" />
     <Compile Include="Client\Client.Table.cs" />
     <Compile Include="Client\Client.Worker.cs" />
     <Compile Include="Client\Client.Worker.IO.cs" />
@@ -72,7 +73,7 @@
     <Compile Include="Client\Client.Worker.ScanDB.cs" />
     <Compile Include="DTC.cs" />
     <Compile Include="DTCConfig.cs" />
-    <Compile Include="DTCLog.cs" />
+    <Compile Include="DTCConsole.cs" />
     <Compile Include="Enum\ExeTypeEnum.cs" />
     <Compile Include="Enum\TableClearMode.cs" />
     <Compile Include="MQ\Kafka\MQ.Kafka.NoSupport.cs" />
@@ -84,6 +85,7 @@
     <Compile Include="Reflect\MethodCollector.cs" />
     <Compile Include="Server\Server.Config.cs" />
     <Compile Include="Server\Server.cs" />
+    <Compile Include="Server\Server.Log.cs" />
     <Compile Include="Server\Server.Table.cs" />
     <Compile Include="Server\Server.Worker.cs" />
     <Compile Include="Server\Server.Worker.IO.cs" />

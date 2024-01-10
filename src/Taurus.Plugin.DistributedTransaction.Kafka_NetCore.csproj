@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>Taurus.DTC</AssemblyName>
     <AssemblyVersion>3.2.0.2</AssemblyVersion>
     <FileVersion>3.2.0.0</FileVersion>
@@ -14,7 +14,7 @@
     <PackageProjectUrl>https://github.com/cyq1162/Taurus.MVC</PackageProjectUrl>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <PackageId>Taurus.DTC</PackageId>
-    <Version>3.2.0</Version>
+    <Version>3.2.1</Version>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <BaseOutputPath>bin\kafka\</BaseOutputPath>
     <BaseIntermediateOutputPath>obj\kafka\</BaseIntermediateOutputPath>
