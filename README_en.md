@@ -1,4 +1,5 @@
-【 <h3><a href='./README.md'>中文</a> | <a href='./README_en.md'>English</a></h3>】
+<h3>【 <a href='./README.md'>中文</a> | <a href='./README_en.md'>English</a>】</h3>
+<hr />
 # Taurus MVC distributed transaction framework, using Net Core Example:：
 
 <h4>Basic Description：</h4>
