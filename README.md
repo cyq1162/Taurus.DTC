@@ -1,6 +1,6 @@
 <h3>【 <a href='./README.md'>中文</a> | <a href='./README_en.md'>English</a>】</h3>
 <hr />
-# Taurus.MVC 分布式事务框架，使用.Net Core 示例：
+# Taurus.DTC 微服务分布式事务框架，使用.Net Core 示例：
 
 <h4>基础说明：</h4>
 <p>1、框架分为 Client（客户端，即调用端）和 Server（服务端，即服务提供方）。</p>
