@@ -116,19 +116,13 @@
 </code></pre>
 <p>5、代码编写，可以参考源码中提供的示例代码，如下：</p>
 <pre><code>
-/// <summary>
-    /// api demo for rabbitmq , start https://localhost:5000/client/transation
-    /// </summary>
     public class ClientController : Taurus.Mvc.Controller
     {
-        /// <summary>
-        /// to call commit transation , start https://localhost:5000/client/transation
-        /// </summary>
         [HttpGet]
         public void Transation()
         {
             //do something
-            RpcTask task = Rpc.StartPostAsync("https://localhost:5001/rabbitserver/create", Encoding.UTF8.GetBytes("name=hello world"));
+            RpcTask task = Rpc.StartPostAsync("https://localhost:5001/server/create", Encoding.UTF8.GetBytes("name=hello world"));
             if (task.Result.IsSuccess)
             {
                 if (JsonHelper.IsSuccess(task.Result.ResultText))
