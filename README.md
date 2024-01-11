@@ -1,3 +1,5 @@
+<h3>【 <a href='./README.md'>中文</a> | <a href='./README_en.md'>English</a>】</h3>
+<hr />
 # Taurus.MVC 分布式事务框架，使用.Net Core 示例：
 
 <h4>基础说明：</h4>
