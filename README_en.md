@@ -36,7 +36,7 @@
 # Server side usage examples：
 <p>1、Nuget search Taurus Introducing DTC into engineering projects。</p>
 <p>2、Program or Startup add service usage introduction:</p>
-<pre><code>  services.AddTaurusMvc(); 
+<pre><code>  services.AddTaurusDtc(); 
   app.UseTaurusDtc(StartType.Server); 
 </code></pre>
 <p>3、appsettings.json config：</p>
@@ -103,7 +103,7 @@
 # Client Example of End Use：
 <p>1、Nuget search Taurus Introducing DTC into engineering projects。</p>
 <p>2、Program or Startup adding service usage introduction：</p>
-<pre><code>  services.AddTaurusMvc(); 
+<pre><code>  services.AddTaurusDtc(); 
   app.UseTaurusDtc(StartType.Client); 
 </code></pre>
 <p>3、appsettings.json config：</p>
