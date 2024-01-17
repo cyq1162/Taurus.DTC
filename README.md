@@ -36,7 +36,7 @@
 # Server 端 使用示例：
 <p>1、Nuget 搜索 Taurus.DTC 引入工程项目中。</p>
 <p>2、Program 或 Startup 添加服务使用引入：</p>
-<pre><code>  services.AddTaurusMvc(); // 服务添加
+<pre><code>  services.AddTaurusDtc(); // 服务添加
   app.UseTaurusDtc(StartType.Server); //服务使用，启用服务端
 </code></pre>
 <p>3、appsettings.json 配置基本属性：</p>
@@ -102,7 +102,7 @@
 # Client 端 使用示例：
 <p>1、Nuget 搜索 Taurus.DTC 引入工程项目中。</p>
 <p>2、Program 或 Startup 添加服务使用引入：</p>
-<pre><code>  services.AddTaurusMvc(); // 服务添加
+<pre><code>  services.AddTaurusDtc(); // 服务添加
   app.UseTaurusDtc(StartType.Client); //服务使用，启用服务端
 </code></pre>
 <p>3、appsettings.json 配置基本属性：</p>
