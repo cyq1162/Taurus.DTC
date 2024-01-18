@@ -18,7 +18,7 @@ namespace Taurus.DTC_Demo.ClientControllers
         public void Transation()
         {
             //do something
-            RpcTask task = Rpc.StartPostAsync("https://localhost:5001/rabbitserver/create", Encoding.UTF8.GetBytes("name=hello world"));
+            RpcTask task = Rpc.StartPostAsync("https://localhost:5001/server/create", Encoding.UTF8.GetBytes("name=hello world"));
             if (task.Result.IsSuccess)
             {
                 if (JsonHelper.IsSuccess(task.Result.ResultText))
