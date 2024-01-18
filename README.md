@@ -1,4 +1,6 @@
-# Taurus.MVC 分布式事务框架，使用.Net Core 示例：
+<h3>【 <a href='./README.md'>中文</a> | <a href='./README_en.md'>English</a>】</h3>
+<hr />
+# Taurus.DTC 微服务分布式事务框架，使用.Net Core 示例：
 
 <h4>基础说明：</h4>
 <p>1、框架分为 Client（客户端，即调用端）和 Server（服务端，即服务提供方）。</p>
@@ -34,7 +36,7 @@
 # Server 端 使用示例：
 <p>1、Nuget 搜索 Taurus.DTC 引入工程项目中。</p>
 <p>2、Program 或 Startup 添加服务使用引入：</p>
-<pre><code>  services.AddTaurusMvc(); // 服务添加
+<pre><code>  services.AddTaurusDtc(); // 服务添加
   app.UseTaurusDtc(StartType.Server); //服务使用，启用服务端
 </code></pre>
 <p>3、appsettings.json 配置基本属性：</p>
@@ -100,7 +102,7 @@
 # Client 端 使用示例：
 <p>1、Nuget 搜索 Taurus.DTC 引入工程项目中。</p>
 <p>2、Program 或 Startup 添加服务使用引入：</p>
-<pre><code>  services.AddTaurusMvc(); // 服务添加
+<pre><code>  services.AddTaurusDtc(); // 服务添加
   app.UseTaurusDtc(StartType.Client); //服务使用，启用服务端
 </code></pre>
 <p>3、appsettings.json 配置基本属性：</p>
