@@ -14,6 +14,7 @@ namespace DTC_Server_Rabbit_Demo
         /// provide a Create api , and it provide a transation , call https://localhost:5001/server/create
         /// </summary>
         [HttpPost]
+        [HttpGet]
         [Require("name")]
         public void Create(string name)
         {

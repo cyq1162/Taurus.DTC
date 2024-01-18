@@ -5,7 +5,9 @@ VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taurus.DTC.Client.Rabbit-Demo", "Taurus.DTC.Client.Rabbit-Demo\Taurus.DTC.Client.Rabbit-Demo.csproj", "{9377F535-F511-4EA8-8E9A-CD8488E16BB3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taurus.DTC.Server.Rabbit-Demo", "Taurus.DTC.Server.Rabbit-Demo\Taurus.DTC.Server.Rabbit-Demo.csproj", "{71493851-C358-44FC-8220-C562E1DF318B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taurus.DTC.Server.Rabbit-Demo", "Taurus.DTC.Server.Rabbit-Demo\Taurus.DTC.Server.Rabbit-Demo.csproj", "{71493851-C358-44FC-8220-C562E1DF318B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taurus.Plugin.DistributedTransaction_NetCore", "..\..\..\src\Taurus.Plugin.DistributedTransaction_NetCore.csproj", "{8C5F9D36-BDDC-42FD-A9C1-74051A83DB52}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{71493851-C358-44FC-8220-C562E1DF318B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71493851-C358-44FC-8220-C562E1DF318B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71493851-C358-44FC-8220-C562E1DF318B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C5F9D36-BDDC-42FD-A9C1-74051A83DB52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C5F9D36-BDDC-42FD-A9C1-74051A83DB52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C5F9D36-BDDC-42FD-A9C1-74051A83DB52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C5F9D36-BDDC-42FD-A9C1-74051A83DB52}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
