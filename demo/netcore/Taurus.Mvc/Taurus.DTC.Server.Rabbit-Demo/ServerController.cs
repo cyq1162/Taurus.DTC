@@ -43,14 +43,5 @@ namespace DTC_Server_Rabbit_Demo
             }
             return false;
         }
-
-        [DTCServerSubscribe("ToDoTask")]
-        private static bool DoSomeTask(DTCServerSubscribePara para)
-        {
-            Console.WriteLine("call :" + para.ExeType + " , content :" + para.Content);
-            para.CallBackContent = "I do ok.";
-            return true;
-        }
-
     }
 }
