@@ -1,6 +1,6 @@
 <h3>【 <a href='./README.md'>中文</a> | <a href='./README_en.md'>English</a>】</h3>
 <hr />
-# Taurus DTC distributed transaction framework, using Net Core Example:：
+# Taurus DTC (Distributed Transaction Coordinator), using Net Core Example:：
 
 <h4>Basic Description：</h4>
 <p>1、The framework is divided into Client (client, i.e. calling end) and Server (server, i.e. service provider)。</p>
