@@ -87,15 +87,6 @@
             }
             return false;
         }
-
-        [DTCServerSubscribe("ToDoTask")] // 订阅任务
-        private static bool DoSomeTask(DTCServerSubscribePara para)
-        {
-            Console.WriteLine("call :" + para.ExeType + " , content :" + para.Content);
-            para.CallBackContent = "I do ok.";
-            return true;
-        }
-
     }
 </code></pre>
 
@@ -152,21 +143,6 @@
         {
             Console.WriteLine("call back : " + para.ExeType + " - " + para.CallBackKey + " - " + para.CallBackContent);
         }
-
-
-        /// <summary>
-        /// to publish a new task , start https://localhost:5000/client/publishtask
-        /// </summary>
-        [HttpGet]
-        public void PublishTask()
-        {
-            if (DTC.Client.PublishTaskAsync("I give you some info.", "ToDoTask", "OnDoOK"))
-            {
-                Console.WriteLine("call : DTC.Client.PublishTaskAsync.");
-            }
-            Write("Publish Task OK.", true);
-        }
-
     }
 </code></pre>
 
