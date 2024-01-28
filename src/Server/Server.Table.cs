@@ -40,6 +40,7 @@ namespace Taurus.Plugin.DistributedTransaction
                         _ID = value;
                     }
                 }
+
                 private string _MsgID;
                 /// <summary>
                 /// 队列消息ID
@@ -78,37 +79,41 @@ namespace Taurus.Plugin.DistributedTransaction
                         _TraceID = value;
                     }
                 }
-                private string _ExChange;
-                /// <summary>
-                /// 发送交换机名称
-                /// </summary>
-                [Length(50)]
-                public string ExChange
-                {
-                    get { return _ExChange; }
-                    set { _ExChange = value; }
-                }
 
-                private string _QueueName;
-                /// <summary>
-                /// 发送队列名称
-                /// </summary>
-                [Length(50)]
-                public string QueueName
-                {
-                    get { return _QueueName; }
-                    set { _QueueName = value; }
-                }
-                private string _CallBackName;
-                /// <summary>
-                /// 队列监听名称
-                /// </summary>
-                [Length(50)]
-                public string CallBackName
-                {
-                    get { return _CallBackName; }
-                    set { _CallBackName = value; }
-                }
+
+
+
+                //private string _ExChange;
+                ///// <summary>
+                ///// 发送交换机名称
+                ///// </summary>
+                //[Length(50)]
+                //public string ExChange
+                //{
+                //    get { return _ExChange; }
+                //    set { _ExChange = value; }
+                //}
+
+                //private string _QueueName;
+                ///// <summary>
+                ///// 发送队列名称
+                ///// </summary>
+                //[Length(50)]
+                //public string QueueName
+                //{
+                //    get { return _QueueName; }
+                //    set { _QueueName = value; }
+                //}
+                //private string _CallBackName;
+                ///// <summary>
+                ///// 队列监听名称
+                ///// </summary>
+                //[Length(50)]
+                //public string CallBackName
+                //{
+                //    get { return _CallBackName; }
+                //    set { _CallBackName = value; }
+                //}
 
                 private string _TaskKey;
                 /// <summary>
@@ -135,7 +140,7 @@ namespace Taurus.Plugin.DistributedTransaction
                 /// <summary>
                 /// 写入内容
                 /// </summary>
-                [Length(2000)]
+                [Length(500)]
                 public string Content
                 {
                     get { return _Content; }
@@ -231,9 +236,9 @@ namespace Taurus.Plugin.DistributedTransaction
                     MQMsg msg = new MQMsg();
                     msg.MsgID = this.MsgID;
                     msg.Content = this.Content;
-                    msg.ExChange = this.ExChange;
-                    msg.QueueName = this.QueueName;
-                    msg.CallBackName = this.CallBackName;
+                    //msg.ExChange = this.ExChange;
+                    //msg.QueueName = this.QueueName;
+                    //msg.CallBackName = this.CallBackName;
                     msg.ExeType = this.ExeType;
                     msg.TraceID = this.TraceID;
                     msg.TaskKey = this.TaskKey;
@@ -252,18 +257,18 @@ namespace Taurus.Plugin.DistributedTransaction
                     {
                         js.Add("TraceID", this.TraceID);
                     }
-                    if (this.ExChange != null)
-                    {
-                        js.Add("ExChange", this.ExChange);
-                    }
-                    if (this.QueueName != null)
-                    {
-                        js.Add("QueueName", this.QueueName);
-                    }
-                    if (this.CallBackName != null)
-                    {
-                        js.Add("CallBackName", this.CallBackName);
-                    }
+                    //if (this.ExChange != null)
+                    //{
+                    //    js.Add("ExChange", this.ExChange);
+                    //}
+                    //if (this.QueueName != null)
+                    //{
+                    //    js.Add("QueueName", this.QueueName);
+                    //}
+                    //if (this.CallBackName != null)
+                    //{
+                    //    js.Add("CallBackName", this.CallBackName);
+                    //}
                     if (this.Content != null)
                     {
                         js.Add("Content", this.Content);

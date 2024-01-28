@@ -18,12 +18,11 @@ namespace Taurus.Plugin.DistributedTransaction
             /// </summary>
             internal static partial class Worker
             {
-                public static bool Add(Table table)
+                public static bool Save(Table table)
                 {
                     bool result = false;
                     if (!string.IsNullOrEmpty(DTCConfig.Client.Conn) && table.Insert(InsertOp.None))
                     {
-                        Log.Print("DB.Write : " + table.ToJson());
                         result = true;
                         table.Dispose();
                     }
@@ -31,12 +30,12 @@ namespace Taurus.Plugin.DistributedTransaction
                     {
                         result = IO.Write(table);//写 DB => Redis、MemCache，失败则写文本。
                     }
-                    if (result)
-                    {
-                        MQPublisher.Add(table.ToMQMsg());//异步发送MQ
-                        DBScanner.Start();//检测未启动则启动，已启动则忽略。
-                    }
                     return result;
+                }
+                public static void Add(MQMsg msg)
+                {
+                    MQPublisher.Add(msg);//异步发送MQ
+                    DBScanner.Start();//检测未启动则启动，已启动则忽略。
                 }
             }
 

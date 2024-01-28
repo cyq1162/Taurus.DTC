@@ -1,5 +1,4 @@
 ﻿using CYQ.Data;
-using CYQ.Data.Lock;
 using CYQ.Data.Table;
 using CYQ.Data.Tool;
 using System;
@@ -7,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
+using Taurus.Plugin.DistributedLock;
 
 namespace Taurus.Plugin.DistributedTransaction
 {
@@ -33,9 +33,6 @@ namespace Taurus.Plugin.DistributedTransaction
                     static readonly object lockObj = new object();
                     public static void Start()
                     {
-                        //1 再加个分布式锁，保障只有一个应用在启动表描述
-                        //1、数据库参数检测
-                        //2、MQ参数检测
                         if (MQ.Server.MQType == MQType.Empty || threadIsWorking)
                         {
                             empty = 1;//保持任务不退出。
@@ -59,35 +56,43 @@ namespace Taurus.Plugin.DistributedTransaction
                         {
                             try
                             {
-                                int scanInterval = DTCConfig.Client.Worker.ScanDBSecond;
-
-                                if (empty <= 0 || empty == scanInterval * 10 || DateTime.Now >= scanTime)
+                                bool isLockOK = false;
+                                try
                                 {
-                                    bool isLockOK = false;
-                                    try
+                                    isLockOK = DLock.Instance.Lock(lockKey, 1);
+                                    if (isLockOK)
                                     {
-                                        if (string.IsNullOrEmpty(DTCConfig.Server.Conn))
+                                        if (empty % 30 == 0)
                                         {
-                                            isLockOK = DistributedLock.Instance.Lock(lockKey, 1);
-                                            if (isLockOK)
+                                            ScanIO_DeleteEmptyDirectory();
+
+                                            if (!string.IsNullOrEmpty(DTCConfig.Server.Conn))
                                             {
-                                                ScanDB();//数据库仅允许一个在扫描
+                                                ScanDB_DeleteConfirm();
+                                                if (empty % 60 == 0)
+                                                {
+                                                    ScanDB_DeleteTimeout();
+                                                    if (empty % 120 == 0)
+                                                    {
+                                                        ScanDB_RetryForConfirm();//2分钟重试1次
+                                                    }
+                                                }
                                             }
                                         }
                                     }
-                                    finally
-                                    {
-                                        if (isLockOK)
-                                        {
-                                            DistributedLock.Instance.UnLock(lockKey);
-                                        }
-                                    }
-                                    ScanIO_DeleteEmptyDirectory();
-                                    scanTime = DateTime.Now.AddSeconds(scanInterval);//按扫描次数增加时间
                                 }
+                                finally
+                                {
+                                    if (isLockOK)
+                                    {
+                                        DLock.Instance.UnLock(lockKey);
+                                    }
+                                }
+
+
                                 Thread.Sleep(1000);
                                 empty++;
-                                if (empty > scanInterval * 10)  //扫描10次都没东西可以扫
+                                if (empty > 4 * 60)  //扫描10次都没东西可以扫
                                 {
                                     ScanIO_DeleteTimeout();
                                     threadIsWorking = false;
@@ -105,15 +110,19 @@ namespace Taurus.Plugin.DistributedTransaction
 
 
 
-
-                    private static void ScanDB()
+                    /// <summary>
+                    /// 向客户端，发起重新确认，以便处理删除。
+                    /// </summary>
+                    private static void ScanDB_RetryForConfirm()
                     {
                         if (string.IsNullOrEmpty(DTCConfig.Server.Conn) || !DBTool.Exists(DTCConfig.Server.TableName, "U", DTCConfig.Server.Conn))
                         {
                             return;
                         }
-                        int maxRetries = DTCConfig.Server.Worker.MaxRetries;
-                        int scanInterval = Math.Max(60, DTCConfig.Server.Worker.ScanDBSecond);//最短1分钟
+                        MQType mQType = MQ.Client.MQType;
+                        if (mQType == MQType.Empty) { return; }
+                        int maxRetries = Math.Max(1, DTCConfig.Server.Worker.MaxRetries);
+                        int scanInterval = Math.Max(60, DTCConfig.Server.Worker.RetryIntervalSecond);//最短1分钟
 
                         using (MAction action = new MAction(DTCConfig.Server.TableName, DTCConfig.Server.Conn))
                         {
@@ -132,6 +141,16 @@ namespace Taurus.Plugin.DistributedTransaction
                                 foreach (MQMsg msg in msgList)
                                 {
                                     msg.SetDeleteAsk();
+                                    if (mQType == MQType.Rabbit)
+                                    {
+                                        msg.ExChange = DTCConfig.Client.MQ.Rabbit.ConfirmExChange;
+                                        msg.CallBackName = DTCConfig.Server.MQ.Rabbit.ConfirmQueue;
+                                    }
+                                    else if (mQType == MQType.Kafka)
+                                    {
+                                        msg.QueueName = DTCConfig.Client.MQ.Kafka.ConfirmTopic;
+                                        msg.CallBackName = DTCConfig.Server.MQ.Kafka.ConfirmTopic;
+                                    }
                                 }
                                 if (MQ.Client.PublishBatch(msgList))
                                 {
@@ -161,9 +180,27 @@ namespace Taurus.Plugin.DistributedTransaction
 
                             #region 清空数据、或转移到历史表
 
+
+
+
+                            #endregion
+                        }
+                    }
+
+
+
+                    private static void ScanDB_DeleteConfirm()
+                    {
+                        if (string.IsNullOrEmpty(DTCConfig.Server.Conn) || !DBTool.Exists(DTCConfig.Server.TableName, "U", DTCConfig.Server.Conn))
+                        {
+                            return;
+                        }
+                        using (MAction action = new MAction(DTCConfig.Server.TableName, DTCConfig.Server.Conn))
+                        {
+                            action.IsUseAutoCache = false;
                             string whereDelete = "ConfirmState=2";
 
-                            if (DTCConfig.Server.Worker.ConfirmClearMode == TableClearMode.Delete)
+                            if (DTCConfig.Server.Worker.ConfirmClearMode == ClearMode.Delete)
                             {
                                 action.Delete(whereDelete);//不讲道理直接清
                             }
@@ -182,9 +219,20 @@ namespace Taurus.Plugin.DistributedTransaction
                                 }
                                 #endregion
                             }
+                        }
+                    }
+                    private static void ScanDB_DeleteTimeout()
+                    {
+                        if (string.IsNullOrEmpty(DTCConfig.Server.Conn) || !DBTool.Exists(DTCConfig.Server.TableName, "U", DTCConfig.Server.Conn))
+                        {
+                            return;
+                        }
+                        using (MAction action = new MAction(DTCConfig.Server.TableName, DTCConfig.Server.Conn))
+                        {
+                            action.IsUseAutoCache = false;
                             int noConfirmSecond = DTCConfig.Server.Worker.TimeoutKeepSecond;
                             string whereTimeout = "ConfirmState<2 and CreateTime<'" + DateTime.Now.AddSeconds(-noConfirmSecond).ToString("yyyy-MM-dd HH:mm:ss") + "'";
-                            if (DTCConfig.Server.Worker.TimeoutClearMode == TableClearMode.Delete)
+                            if (DTCConfig.Server.Worker.TimeoutClearMode == ClearMode.Delete)
                             {
                                 action.Delete(whereTimeout);
                             }
@@ -206,8 +254,6 @@ namespace Taurus.Plugin.DistributedTransaction
 
                                 #endregion
                             }
-
-                            #endregion
                         }
                     }
 

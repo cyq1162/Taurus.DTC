@@ -1,9 +1,4 @@
 ﻿using CYQ.Data;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-
 namespace Taurus.Plugin.DistributedTransaction
 {
     public static partial class DTCConfig
@@ -31,18 +26,13 @@ namespace Taurus.Plugin.DistributedTransaction
 
             /// <summary>
             /// 配置是否 打印追踪日志，用于调试
-            /// 如 DTC.Client.IsPrintTraceLog ：true， 默认值：true
+            /// 如 DTC.Client.IsPrintTraceLog ：true， 默认值：false
             /// </summary>
             public static bool IsPrintTraceLog
             {
                 get
                 {
-#if DEBUG
-                    return AppConfig.GetAppBool("DTC.Client.IsPrintTraceLog", true);
-#else
                     return AppConfig.GetAppBool("DTC.Client.IsPrintTraceLog", false);
-#endif
-
                 }
                 set
                 {
@@ -116,66 +106,89 @@ namespace Taurus.Plugin.DistributedTransaction
             /// </summary>
             internal static class MQ
             {
-                /// <summary>
-                /// DTC 默认交换机名称，绑定所Default队列
-                /// </summary>
-                internal static string DefaultExChange
+               
+                public static class Rabbit
                 {
-                    get
+                    /// <summary>
+                    /// DTC 默认交换机名称，绑定所Default队列
+                    /// </summary>
+                    internal static string DefaultExChange
                     {
-                        return "DTC_Client_Default";
+                        get
+                        {
+                            return "DTC_Client_Default";
+                        }
+                    }
+
+                    /// <summary>
+                    /// DTC 默认交换机名称，绑定所有Confirm队列
+                    /// </summary>
+                    internal static string ConfirmExChange
+                    {
+                        get
+                        {
+                            return "DTC_Client_Confirm";
+                        }
+                    }
+                    /// <summary>
+                    /// 首次队列往这发，比较急。
+                    /// </summary>
+                    internal static string DefaultQueue
+                    {
+                        get
+                        {
+                            return "DTC_Client_Default_" + ProjectName;
+                        }
+                    }
+
+                    /// <summary>
+                    /// 确认删除队列往这发。
+                    /// </summary>
+                    internal static string ConfirmQueue
+                    {
+                        get
+                        {
+                            return "DTC_Client_Confirm_" + ProjectName;
+                        }
                     }
                 }
-                /// <summary>
-                /// DTC 默认交换机名称，绑定所有Retry队列
-                /// </summary>
-                internal static string RetryExChange
+
+                public static class Kafka
                 {
-                    get
+                    internal static string DefaultTopic
                     {
-                        return "DTC_Client_Retry";
+                        get
+                        {
+                            return "DTC_Client_Default";
+                        }
+                    }
+
+                    internal static string ConfirmTopic
+                    {
+                        get
+                        {
+                            return "DTC_Client_Confirm";
+                        }
+                    }
+
+                    internal static string DefaultGroup
+                    {
+                        get
+                        {
+                            return "DTC_Client_Default_" + ProjectName;
+                        }
+                    }
+
+                    internal static string ConfirmGroup
+                    {
+                        get
+                        {
+                            return "DTC_Client_Confirm_" + ProjectName;
+                        }
                     }
                 }
-                /// <summary>
-                /// DTC 默认交换机名称，绑定所有Confirm队列
-                /// </summary>
-                internal static string ConfirmExChange
-                {
-                    get
-                    {
-                        return "DTC_Client_Confirm";
-                    }
-                }
-                /// <summary>
-                /// 首次队列往这发，比较急。
-                /// </summary>
-                internal static string DefaultQueue
-                {
-                    get
-                    {
-                        return ProjectName + "_DTC_Client_Default";
-                    }
-                }
-                /// <summary>
-                /// 定时扫描队列往这发
-                /// </summary>
-                internal static string RetryQueue
-                {
-                    get
-                    {
-                        return ProjectName + "_DTC_Client_Retry";
-                    }
-                }
-                /// <summary>
-                /// 确认删除队列往这发。
-                /// </summary>
-                internal static string ConfirmQueue
-                {
-                    get
-                    {
-                        return ProjectName + "_DTC_Client_Confirm";
-                    }
-                }
+
+               
             }
 
             /// <summary>
@@ -184,43 +197,30 @@ namespace Taurus.Plugin.DistributedTransaction
             public static class Worker
             {
                 /// <summary>
-                /// 扫描数据库表的间隔时间：单位（秒）
+                /// 事务发送后，未收到服务端响应时，间隔多久重新发起任务：单位（秒），默认3分钟
+                /// 配置项：DTC.Client.RetryIntervalSecond ：300
                 /// </summary>
-                public static int ScanDBSecond
+                public static int RetryIntervalSecond
                 {
                     get
                     {
-                        return AppConfig.GetAppInt("DTC.Client.ScanDBSecond", 10);
+                        return AppConfig.GetAppInt("DTC.Client.RetryIntervalSecond", 3 * 60);
                     }
                     set
                     {
-                        AppConfig.SetApp("DTC.Client.ScanDBSecond", ((int)value).ToString());
+                        AppConfig.SetApp("DTC.Client.RetryIntervalSecond", ((int)value).ToString());
                     }
                 }
-                ///// <summary>
-                ///// DTC 本地消息数据表：已确认数据保留时间：（单位秒）
-                ///// 配置项：DTC.Client.ConfirmKeepSecond ：60
-                ///// </summary>
-                //public static int ConfirmKeepSecond
-                //{
-                //    get
-                //    {
-                //        return AppConfig.GetAppInt("DTC.Client.ConfirmKeepSecond", 60);
-                //    }
-                //    set
-                //    {
-                //        AppConfig.SetApp("DTC.Client.ConfirmKeepSecond", ((int)value).ToString());
-                //    }
-                //}
+
                 /// <summary>
-                /// DTC 本地消息数据表清除模式：0删除、1转移到历史表
+                /// 事务完成，收到确认后：0 删除（默认）、1 转移到历史表
                 /// 配置项：DTC.Client.ConfirmClearMode ：0
                 /// </summary>
-                public static TableClearMode ConfirmClearMode
+                public static ClearMode ConfirmClearMode
                 {
                     get
                     {
-                        return (TableClearMode)AppConfig.GetAppInt("DTC.Client.ConfirmClearMode", (int)TableClearMode.MoveToNewTable);
+                        return (ClearMode)AppConfig.GetAppInt("DTC.Client.ConfirmClearMode", (int)ClearMode.Delete);
                     }
                     set
                     {
@@ -228,7 +228,7 @@ namespace Taurus.Plugin.DistributedTransaction
                     }
                 }
                 /// <summary>
-                /// DTC 本地消息数据表：未确认数据保留时间：（单位秒）
+                /// 事务发起后，未收到确认时，数据保留时间：（单位秒），默认7天
                 /// 配置项：DTC.Client.TimeoutKeepSecond ：7 * 24 * 3600
                 /// </summary>
                 public static int TimeoutKeepSecond
@@ -243,14 +243,14 @@ namespace Taurus.Plugin.DistributedTransaction
                     }
                 }
                 /// <summary>
-                /// DTC 本地消息数据表清除模式：0删除、1转移到历史表
-                /// 配置项：DTC.Client.NoConfirmClearMode ：1
+                /// 事务发起后，未收到确认，超时后数据：0 删除、1 转移到历史表（默认）
+                /// 配置项：DTC.Client.TimeoutClearMode ：1
                 /// </summary>
-                public static TableClearMode TimeoutClearMode
+                public static ClearMode TimeoutClearMode
                 {
                     get
                     {
-                        return (TableClearMode)AppConfig.GetAppInt("DTC.Client.TimeoutClearMode", (int)TableClearMode.MoveToNewTable);
+                        return (ClearMode)AppConfig.GetAppInt("DTC.Client.TimeoutClearMode", (int)ClearMode.MoveToHistoryTable);
                     }
                     set
                     {
@@ -258,7 +258,8 @@ namespace Taurus.Plugin.DistributedTransaction
                     }
                 }
                 /// <summary>
-                /// 最大重试次数。
+                /// 任务发起后，未收到确认时，最大重试次数。
+                /// 配置项：DTC.Client.MaxRetries ：50
                 /// </summary>
                 public static int MaxRetries
                 {

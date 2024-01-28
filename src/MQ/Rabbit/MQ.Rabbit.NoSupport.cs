@@ -31,7 +31,7 @@ namespace Taurus.Plugin.DistributedTransaction
             throw new NotImplementedException();
         }
 
-        public override bool Listen(string queueNameOrGroupName, OnReceivedDelegate onReceivedDelegate, string bindExNameOrTopicName)
+        public override bool Listen(string queueNameOrGroupName, OnReceivedDelegate onReceivedDelegate, string bindExNameOrTopicName, bool isBroadcast)
         {
             throw new NotImplementedException();
         }

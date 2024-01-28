@@ -7,46 +7,42 @@ namespace Taurus.Plugin.DistributedTransaction
 {
 
     /// <summary>
-    /// DTCClientCallBack 标注的方法传递参数
+    /// DTCServerSubscribe标注的方法传递参数
     /// </summary>
-    public class DTCClientCallBackPara
+    public class DTCSubscribePara
     {
-        internal DTCClientCallBackPara(MQMsg msg)
+        internal DTCSubscribePara(MQMsg msg)
         {
             this.MsgID = msg.MsgID;
             this.ExeType = ConvertTool.ChangeType<ExeType>(msg.ExeType);
-            this.CallBackContent = msg.Content;
-            this.TaskKey = msg.TaskKey;
-            this.CallBackKey = msg.CallBackKey;
+            this.Content = msg.Content;
+            this.SubKey = msg.CallBackKey;
             this.TraceID = msg.TraceID;
         }
         /// <summary>
-        /// 唯一消息ID
+        /// 消息唯一ID
         /// </summary>
         public string MsgID { get; set; }
         /// <summary>
         /// 执行类型
         /// </summary>
         public ExeType ExeType { get; set; }
-
         /// <summary>
-        /// 回调回来的消息内容
+        /// 传递的消息内容
+        /// </summary>
+        public string Content { get; set; }
+        /// <summary>
+        /// 如果需要写入内容发往回调处，可以对此赋值。
         /// </summary>
         public string CallBackContent { get; set; }
         /// <summary>
-        /// 任务Key
+        /// 方法绑定Key
         /// </summary>
-        public string TaskKey { get; set; }
-
-        /// <summary>
-        /// 回调Key
-        /// </summary>
-        public string CallBackKey { get; set; }
+        public string SubKey { get; set; }
 
         /// <summary>
         /// 分布式追踪ID
         /// </summary>
         public string TraceID { get; set; }
-
     }
 }

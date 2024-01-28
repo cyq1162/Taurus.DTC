@@ -37,8 +37,8 @@
     <DocumentationFile>bin\Rabbit\Release\Taurus.DTC.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CYQ.Data, Version=5.9.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\cyqdata.5.9.0\lib\net40\CYQ.Data.dll</HintPath>
+    <Reference Include="CYQ.Data, Version=5.9.0.6, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\cyqdata.5.9.0.6\lib\net40\CYQ.Data.dll</HintPath>
     </Reference>
     <Reference Include="RabbitMQ.Client, Version=3.4.3.0, Culture=neutral, PublicKeyToken=89e7d7c5feba84ce, processorArchitecture=MSIL">
       <HintPath>packages\RabbitMQ.Client.3.4.3\lib\net35\RabbitMQ.Client.dll</HintPath>
@@ -57,12 +57,15 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Taurus.DistributedLock, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Taurus.DistributedLock.2.0.1.1\lib\net40\Taurus.DistributedLock.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attribute\DTCClientCallBackAttribute.cs" />
-    <Compile Include="Attribute\DTCClientCallBackPara.cs" />
-    <Compile Include="Attribute\DTCServerSubscribeAttribute.cs" />
-    <Compile Include="Attribute\DTCServerSubscribePara.cs" />
+    <Compile Include="Attribute\DTCCallBackAttribute.cs" />
+    <Compile Include="Attribute\DTCCallBackPara.cs" />
+    <Compile Include="Attribute\DTCSubscribeAttribute.cs" />
+    <Compile Include="Attribute\DTCSubscribePara.cs" />
     <Compile Include="Client\Client.Config.cs" />
     <Compile Include="Client\Client.cs" />
     <Compile Include="Client\Client.Log.cs" />
@@ -74,12 +77,13 @@
     <Compile Include="DTC.cs" />
     <Compile Include="DTCConfig.cs" />
     <Compile Include="DTCConsole.cs" />
+    <Compile Include="Enum\ClearMode.cs" />
     <Compile Include="Enum\ExeTypeEnum.cs" />
-    <Compile Include="Enum\TableClearMode.cs" />
     <Compile Include="MQ\Kafka\MQ.Kafka.NoSupport.cs" />
     <Compile Include="MQ\MQ.cs" />
     <Compile Include="MQ\MQMsg.cs" />
-    <Compile Include="MQ\Rabbit\DotNet\MQ.Rabbit.cs" />
+    <Compile Include="MQ\Rabbit\DotNet\MQ.Rabbit.PublishBatch.cs" />
+    <Compile Include="MQ\Rabbit\MQ.Rabbit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reflect\AssemblyCollector.cs" />
     <Compile Include="Reflect\MethodCollector.cs" />
@@ -93,10 +97,10 @@
     <Compile Include="Server\Server.Worker.ScanDB.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <Content Include="UpdateLog.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="UpdateLog.txt" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

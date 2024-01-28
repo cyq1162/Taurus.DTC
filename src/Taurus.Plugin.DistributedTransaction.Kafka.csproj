@@ -40,8 +40,8 @@
     <Reference Include="Confluent.Kafka, Version=1.8.2.0, Culture=neutral, PublicKeyToken=12c514ca49093d1e, processorArchitecture=MSIL">
       <HintPath>packages\Confluent.Kafka.1.8.2\lib\net45\Confluent.Kafka.dll</HintPath>
     </Reference>
-    <Reference Include="CYQ.Data, Version=5.9.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\cyqdata.5.9.0\lib\net40\CYQ.Data.dll</HintPath>
+    <Reference Include="CYQ.Data, Version=5.9.0.6, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\cyqdata.5.9.0.6\lib\net40\CYQ.Data.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -57,12 +57,15 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Taurus.DistributedLock, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Taurus.DistributedLock.2.0.1.1\lib\net40\Taurus.DistributedLock.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attribute\DTCClientCallBackAttribute.cs" />
-    <Compile Include="Attribute\DTCClientCallBackPara.cs" />
-    <Compile Include="Attribute\DTCServerSubscribeAttribute.cs" />
-    <Compile Include="Attribute\DTCServerSubscribePara.cs" />
+    <Compile Include="Attribute\DTCCallBackAttribute.cs" />
+    <Compile Include="Attribute\DTCCallBackPara.cs" />
+    <Compile Include="Attribute\DTCSubscribeAttribute.cs" />
+    <Compile Include="Attribute\DTCSubscribePara.cs" />
     <Compile Include="Client\Client.Config.cs" />
     <Compile Include="Client\Client.cs" />
     <Compile Include="Client\Client.Log.cs" />
@@ -74,8 +77,8 @@
     <Compile Include="DTC.cs" />
     <Compile Include="DTCConfig.cs" />
     <Compile Include="DTCConsole.cs" />
+    <Compile Include="Enum\ClearMode.cs" />
     <Compile Include="Enum\ExeTypeEnum.cs" />
-    <Compile Include="Enum\TableClearMode.cs" />
     <Compile Include="MQ\Kafka\MQ.Kafka.cs" />
     <Compile Include="MQ\MQ.cs" />
     <Compile Include="MQ\MQMsg.cs" />

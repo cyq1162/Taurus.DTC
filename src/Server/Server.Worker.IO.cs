@@ -1,11 +1,13 @@
 ﻿using CYQ.Data;
 using CYQ.Data.Cache;
 using CYQ.Data.Json;
-using CYQ.Data.Lock;
 using CYQ.Data.Tool;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
+using Taurus.Plugin.DistributedLock;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Taurus.Plugin.DistributedTransaction
 {
@@ -20,6 +22,7 @@ namespace Taurus.Plugin.DistributedTransaction
             {
                 internal static class IO
                 {
+                    private static string serverPath = AppConfig.WebRootPath + "App_Data/dtc/server/";
                     private static string GetKey(string key)
                     {
                         return "DTC.Server:" + key;
@@ -30,37 +33,9 @@ namespace Taurus.Plugin.DistributedTransaction
                     /// </summary>
                     public static bool Write(Table table)
                     {
-                        var disCache = DistributedCache.Instance;
                         string json = table.ToJson();
-                        bool isOK = false;
-                        if (disCache.CacheType == CacheType.Redis || disCache.CacheType == CacheType.MemCache)
-                        {
-                            isOK = disCache.Set(GetKey(table.MsgID), json, DTCConfig.Server.Worker.TimeoutKeepSecond / 60);//写入分布式缓存
-                            SetTraceIDListWithDisLock(disCache, table.TraceID, table.MsgID, table.ExeType, true);//写入traceID => 多个msgID
-                        }
-                        if (isOK)
-                        {
-                            Log.Print(disCache.CacheType + ".Write : " + json);
-                        }
-                        else
-                        {
-                            string path = AppConfig.WebRootPath + "App_Data/dtc/server/";
-                            if (table.ExeType == ExeType.Task.ToString())
-                            {
-                                path += table.MsgID + ".txt";
-                            }
-                            else
-                            {
-                                path += table.TraceID.Replace(':', '_') + "/" + table.MsgID + ".txt";
-                            }
-                            isOK = IOHelper.Write(path, json);
-                            if (isOK)
-                            {
-                                Log.Print("IO.Write : " + json);
-                            }
-                        }
-                        return isOK;
-
+                        string path = serverPath + table.TraceID.Replace(':', '_') + "/" + table.MsgID + ".txt";
+                        return IOHelper.Write(path, json);
 
                     }
 
@@ -69,51 +44,10 @@ namespace Taurus.Plugin.DistributedTransaction
                     /// </summary>
                     public static bool Delete(string traceID, string msgID, string exeType)
                     {
-                        var disCache = DistributedCache.Instance;
-                        bool isOK = false;
-                        if (disCache.CacheType == CacheType.Redis || disCache.CacheType == CacheType.MemCache)
-                        {
-                            isOK = disCache.Remove(GetKey(msgID));//删除数据。
-                            SetTraceIDListWithDisLock(disCache, traceID, msgID, exeType, false);//写入traceID => 多个msgID
-
-                        }
-                        if (!isOK)
-                        {
-                            if (exeType == ExeType.Task.ToString())
-                            {
-                                string path = AppConfig.WebRootPath + "App_Data/dtc/server/" + msgID + ".txt";
-                                isOK = IOHelper.Delete(path);
-                            }
-                            else
-                            {
-                                string folder = AppConfig.WebRootPath + "App_Data/dtc/server/" + traceID.Replace(':', '_');
-                                string path = folder + "/" + msgID + ".txt";
-                                isOK = IOHelper.Delete(path);
-                            }
-                        }
-                        return isOK;
+                        string path = serverPath + traceID.Replace(':', '_') + "/" + msgID + ".txt";
+                        return IOHelper.Delete(path);
                     }
 
-                    /// <summary>
-                    /// 是否存在数据
-                    /// </summary>
-                    public static bool Exists(string traceID, string msgID, string exeType)
-                    {
-                        string id = exeType == ExeType.Task.ToString() ? msgID : traceID;
-                        var disCache = DistributedCache.Instance;
-                        bool isExists = false;
-                        if (disCache.CacheType == CacheType.Redis || disCache.CacheType == CacheType.MemCache)
-                        {
-                            isExists = disCache.Get(GetKey(id)) != null;
-
-                        }
-                        if (!isExists)
-                        {
-                            string path = AppConfig.WebRootPath + "App_Data/dtc/server/" + id.Replace(':', '_') + ".txt";
-                            isExists = IOHelper.ExistsDirectory(path);
-                        }
-                        return isExists;
-                    }
                     /// <summary>
                     /// 获取数据：仅commit、rollback用到
                     /// </summary>
@@ -121,43 +55,20 @@ namespace Taurus.Plugin.DistributedTransaction
                     {
                         List<Table> tables = new List<Table>();
 
-                        var disCache = DistributedCache.Instance;
-                        if (disCache.CacheType == CacheType.Redis || disCache.CacheType == CacheType.MemCache)
+                        string folder = serverPath + traceID.Replace(':', '_');
+                        string[] files = IOHelper.GetFiles(folder);
+                        if (files != null && files.Length > 0)
                         {
-                            var ids = disCache.Get<string>(GetKey(traceID));
-                            if (!string.IsNullOrEmpty(ids))
+                            foreach (string file in files)
                             {
-                                foreach (string id in ids.Split(','))
+                                string json = IOHelper.ReadAllText(file, 0);
+                                if (!string.IsNullOrEmpty(json))
                                 {
-                                    var json = disCache.Get<string>(GetKey(id));
-                                    if (!string.IsNullOrEmpty(json))
-                                    {
-                                        var entity = JsonHelper.ToEntity<Table>(json);
-                                        if (entity != null)
-                                        {
-                                            tables.Add(entity);
-                                        }
+                                    tables.Add(JsonHelper.ToEntity<Table>(json));
+                                }
+                            }
+                        }
 
-                                    }
-                                }
-                            }
-                        }
-                        if (tables.Count == 0)
-                        {
-                            string folder = AppConfig.WebRootPath + "App_Data/dtc/server/" + traceID.Replace(':', '_');
-                            string[] files = IOHelper.GetFiles(folder);
-                            if (files != null && files.Length > 0)
-                            {
-                                foreach (string file in files)
-                                {
-                                    string json = IOHelper.ReadAllText(file, 0);
-                                    if (!string.IsNullOrEmpty(json))
-                                    {
-                                        tables.Add(JsonHelper.ToEntity<Table>(json));
-                                    }
-                                }
-                            }
-                        }
                         return tables;
                     }
 
@@ -171,8 +82,7 @@ namespace Taurus.Plugin.DistributedTransaction
                         {
                             try
                             {
-                                string folder = AppConfig.WebRootPath + "App_Data/dtc/server/";
-                                DirectoryInfo directoryInfo = new DirectoryInfo(folder);
+                                DirectoryInfo directoryInfo = new DirectoryInfo(serverPath);
                                 if (directoryInfo.Exists)
                                 {
                                     //System.IO.Directory.em
@@ -203,90 +113,28 @@ namespace Taurus.Plugin.DistributedTransaction
                     /// </summary>
                     public static void DeleteEmptyDirectory()
                     {
-                        var disCache = DistributedCache.Instance;
-                        if (disCache.CacheType == CacheType.LocalCache)
+                        try
                         {
-                            try
+                            if (IOHelper.ExistsDirectory(serverPath))
                             {
-                                string folder = AppConfig.WebRootPath + "App_Data/dtc/server/";
-                                if (System.IO.Directory.Exists(folder))
+                                //删除空文件夹
+                                string[] folders = Directory.GetDirectories(serverPath);
+                                if (folders != null && folders.Length > 0)
                                 {
-                                    //删除空文件夹
-                                    string[] folders = Directory.GetDirectories(folder);
-                                    if (folders != null && folders.Length > 0)
+                                    foreach (string path in folders)
                                     {
-                                        foreach (string path in folders)
+                                        if (IOHelper.GetFiles(path, "*", SearchOption.TopDirectoryOnly).Length == 0)
                                         {
-                                            if (Directory.GetFiles(path, "*", SearchOption.TopDirectoryOnly).Length == 0)
-                                            {
-                                                Directory.Delete(path, false);
-                                            }
+                                            IOHelper.DeleteDirectory(path, false);
                                         }
                                     }
                                 }
                             }
-                            catch (Exception err)
-                            {
-                                Log.Error(err);
-                            }
                         }
-                    }
-                    /// <summary>
-                    /// 维护一个列表：TraceID=>{id1,id2,id3}
-                    /// </summary>
-                    private static void SetTraceIDListWithDisLock(DistributedCache disCache, string traceID, string msgID, string exeType, bool isWrite)
-                    {
-                        if (exeType == ExeType.Task.ToString()) { return; }
-                        double defaultCacheTime = DTCConfig.Server.Worker.TimeoutKeepSecond / 60;
-                        #region 更新列表
-                        var disLock = DistributedLock.Instance;
-                        bool isGetLock = false;
-                        var traceKey = GetKey(traceID);
-                        string lockKey = traceKey + ".lock";// GetKey("Lock." + traceID);// ;
-                        try
+                        catch (Exception err)
                         {
-                            isGetLock = disLock.Lock(lockKey, 5000);//锁定
-                            if (isGetLock)
-                            {
-                                var ids = disCache.Get<string>(traceKey);
-                                if (isWrite)
-                                {
-                                    if (ids == null)
-                                    {
-                                        disCache.Set(traceKey, msgID + ",", defaultCacheTime);
-
-                                    }
-                                    else
-                                    {
-                                        disCache.Set(traceKey, ids + msgID + ",", defaultCacheTime);
-                                    }
-                                }
-                                else
-                                {
-                                    //remove
-                                    if (!string.IsNullOrEmpty(ids))
-                                    {
-                                        ids = ids.Replace(msgID + ",", "");
-                                    }
-                                    if (string.IsNullOrEmpty(ids))
-                                    {
-                                        disCache.Remove(traceKey);
-                                    }
-                                    else
-                                    {
-                                        disCache.Set(traceKey, ids, defaultCacheTime);
-                                    }
-                                }
-                            }
+                            Log.Error(err);
                         }
-                        finally
-                        {
-                            if (isGetLock)
-                            {
-                                disLock.UnLock(lockKey);//释放锁。
-                            }
-                        }
-                        #endregion
 
                     }
                 }

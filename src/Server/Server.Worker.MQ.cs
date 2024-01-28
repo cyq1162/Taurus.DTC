@@ -86,18 +86,40 @@ namespace Taurus.Plugin.DistributedTransaction
                         }
                     }
 
+                    private static bool hasInitListen = false;
+                    /// <summary>
+                    /// 初始化一次监听
+                    /// </summary>
+                    /// <param name="p"></param>
                     public static void InitQueueListen(object p)
                     {
+                        if(hasInitListen) return;
                         var mq = MQ.Server;
                         if (mq.MQType != MQType.Empty)
                         {
-                            //对默认对列绑定交换机。
-                            bool isOK = MQ.Server.Listen(DTCConfig.Server.MQ.DefaultQueue, Server.OnReceived, DTCConfig.Server.MQ.DefaultExChange);
-                            DTCConsole.WriteDebugLine("DTC.Server." + mq.MQType + ".Listen : " + DTCConfig.Server.MQ.DefaultQueue + (isOK ? " - OK." : " - Fail."));
-                            isOK = MQ.Server.Listen(DTCConfig.Server.MQ.RetryQueue, Server.OnReceived, DTCConfig.Server.MQ.RetryExChange);
-                            DTCConsole.WriteDebugLine("DTC.Server." + mq.MQType + ".Listen : " + DTCConfig.Server.MQ.RetryQueue + (isOK ? " - OK." : " - Fail."));
-                            isOK = MQ.Server.Listen(DTCConfig.Server.MQ.ConfirmQueue, Server.OnReceived, DTCConfig.Server.MQ.ConfirmExChange);
-                            DTCConsole.WriteDebugLine("DTC.Server." + mq.MQType + ".Listen : " + DTCConfig.Server.MQ.ConfirmQueue + (isOK ? " - OK." : " - Fail."));
+                            hasInitListen = true;
+                            string printMsg = "--------------------------------------------------" + Environment.NewLine;
+                            if (mq.MQType == MQType.Rabbit)
+                            {
+
+                                //对默认对列绑定交换机。
+                                bool isOK = MQ.Server.Listen(DTCConfig.Server.MQ.Rabbit.DefaultQueue, Server.OnReceived, DTCConfig.Server.MQ.Rabbit.DefaultExChange, false);
+                                printMsg += "DTC.Server." + mq.MQType + ".Listen : " + DTCConfig.Server.MQ.Rabbit.DefaultQueue + " - ExChange : " + DTCConfig.Server.MQ.Rabbit.DefaultExChange + (isOK ? " - OK." : " - Fail.") + Environment.NewLine;
+
+                                isOK = MQ.Server.Listen(DTCConfig.Server.MQ.Rabbit.ConfirmQueue, Server.OnReceived, DTCConfig.Server.MQ.Rabbit.ConfirmExChange, false);
+                                printMsg += "DTC.Server." + mq.MQType + ".Listen : " + DTCConfig.Server.MQ.Rabbit.ConfirmQueue + " - ExChange : " + DTCConfig.Server.MQ.Rabbit.ConfirmExChange + (isOK ? " - OK." : " - Fail.") + Environment.NewLine;
+
+                            }
+                            else if (mq.MQType == MQType.Kafka)
+                            {
+                                bool isOK = MQ.Server.Listen(DTCConfig.Server.MQ.Kafka.DefaultTopic, Server.OnReceived, DTCConfig.Server.MQ.Kafka.DefaultGroup, false);
+                                printMsg += "DTC.Server." + mq.MQType + ".Listen : " + DTCConfig.Server.MQ.Kafka.DefaultTopic + " -  Group : " + DTCConfig.Server.MQ.Kafka.DefaultGroup + (isOK ? " - OK." : " - Fail.") + Environment.NewLine;
+
+                                isOK = MQ.Server.Listen(DTCConfig.Server.MQ.Kafka.ConfirmTopic, Server.OnReceived, DTCConfig.Server.MQ.Kafka.ConfirmGroup, false);
+                                printMsg += "DTC.Server." + mq.MQType + ".Listen : " + DTCConfig.Server.MQ.Kafka.ConfirmTopic + " -  Group : " + DTCConfig.Server.MQ.Kafka.ConfirmGroup + (isOK ? " - OK." : " - Fail.") + Environment.NewLine;
+                            }
+                            printMsg += "--------------------------------------------------" + Environment.NewLine;
+                            DTCConsole.WriteLine(printMsg);
                         }
                     }
                 }

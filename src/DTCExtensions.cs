@@ -13,27 +13,27 @@ namespace Microsoft.AspNetCore.Http
 
         public static IApplicationBuilder UseTaurusDtc(this IApplicationBuilder builder)
         {
-            return UseTaurusDtc(builder, StartType.None);
+            return UseTaurusDtc(builder, DTCStartType.None);
         }
-        public static IApplicationBuilder UseTaurusDtc(this IApplicationBuilder builder, StartType startType)
+        public static IApplicationBuilder UseTaurusDtc(this IApplicationBuilder builder, DTCStartType startType)
         {
             builder.UseHttpContext();
             switch (startType)
             {
-                case StartType.Client:
+                case DTCStartType.Client:
                     DTC.Client.Start();
                     break;
-                case StartType.Server:
+                case DTCStartType.Server:
                     DTC.Server.Start();
                     break;
-                case StartType.Both:
+                case DTCStartType.Both:
                     DTC.Start();
                     break;
             }
             return builder;
         }
     }
-    public enum StartType
+    public enum DTCStartType
     {
         /// <summary>
         /// 不设定，应用程序启动或重启时，不先启动数据扫描，由程序涉及调用相关函数时自动启动数据扫描。

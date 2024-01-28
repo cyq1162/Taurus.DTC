@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using CYQ.Data.Json;
 
 namespace Taurus.Plugin.DistributedTransaction
@@ -119,6 +120,23 @@ namespace Taurus.Plugin.DistributedTransaction
                 if (dic.ContainsKey("IsFirstAck")) { msg.IsFirstAck = Convert.ToBoolean(dic["IsFirstAck"]); }
                 if (dic.ContainsKey("IsDeleteAck")) { msg.IsDeleteAck = Convert.ToBoolean(dic["IsDeleteAck"]); }
             }
+            return msg;
+        }
+
+        public MQMsg Clone()
+        {
+            MQMsg msg = new MQMsg();
+            msg.ExChange = this.ExChange;
+            msg.QueueName = this.QueueName;
+            msg.IsFirstAck=this.IsFirstAck;
+            msg.CallBackKey=this.CallBackKey;
+            msg.CallBackName=this.CallBackName;
+            msg.Content = this.Content;
+            msg.ExeType = this.ExeType;
+            msg.IsDeleteAck=this.IsDeleteAck;
+            msg.TaskKey = this.TaskKey;
+            msg.TraceID=this.TraceID;
+            msg.MsgID = this.MsgID;
             return msg;
         }
     }

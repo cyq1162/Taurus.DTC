@@ -42,7 +42,7 @@ namespace Taurus.Plugin.DistributedTransaction
                         foreach (string key in keys)
                         {
                             ListenPara para = listenFailDic[key];
-                            _IsListenOK = Listen(key, para.Event, null);
+                            _IsListenOK = Listen(key, para.Event, null, para.IsBroadcast);
                             if (_IsListenOK)
                             {
                                 listenFailDic.Remove(key);
@@ -88,7 +88,7 @@ namespace Taurus.Plugin.DistributedTransaction
         {
             try
             {
-                if (msg == null || (string.IsNullOrEmpty(msg.QueueName) && string.IsNullOrEmpty(msg.ExChange)))
+                if (msg == null || string.IsNullOrEmpty(msg.QueueName))
                 {
                     return false;
                 }
@@ -103,20 +103,8 @@ namespace Taurus.Plugin.DistributedTransaction
 
                 using (var producer = new ProducerBuilder<string, string>(config).Build())
                 {
-                    if (string.IsNullOrEmpty(msg.QueueName))
-                    {
-                        List<string> topics = GetTopics(msg.ExChange);
-                        if (topics == null || topics.Count == 0) { return false; }
-                        foreach (var topic in topics)
-                        {
-                            producer.ProduceAsync(topic, data);
-                        }
-                    }
-                    else
-                    {
-                        producer.ProduceAsync(msg.QueueName, data);
-                    }
-                    producer.Flush();
+                    producer.ProduceAsync(msg.QueueName, data);
+                    producer.Flush(TimeSpan.FromSeconds(10));
                 }
                 return true;
             }
@@ -143,22 +131,9 @@ namespace Taurus.Plugin.DistributedTransaction
                     {
                         string json = msg.ToJson();
                         var data = new Message<string, string> { Key = null, Value = json };
-
-                        if (string.IsNullOrEmpty(msg.QueueName))
-                        {
-                            List<string> topics = GetTopics(msg.ExChange);
-                            if (topics == null || topics.Count == 0) { return false; }
-                            foreach (var topic in topics)
-                            {
-                                producer.Produce(topic, data);
-                            }
-                        }
-                        else
-                        {
-                            producer.Produce(msg.QueueName, data);
-                        }
+                        producer.Produce(msg.QueueName, data);
                     }
-                    producer.Flush();
+                    producer.Flush(TimeSpan.FromSeconds(10));
                 }
                 return true;
             }
@@ -169,7 +144,7 @@ namespace Taurus.Plugin.DistributedTransaction
             }
         }
 
-        public override bool Listen(string topic, OnReceivedDelegate onReceivedDelegate, string exName)
+        public override bool Listen(string topic, OnReceivedDelegate onReceivedDelegate, string group, bool isBroadcast)
         {
             if (string.IsNullOrEmpty(topic) || onReceivedDelegate == null)
             {
@@ -183,7 +158,7 @@ namespace Taurus.Plugin.DistributedTransaction
             {
                 if (CreateTopicIfNoExists(topic))
                 {
-                    ListenPara para = new ListenPara() { Topic = topic, Event = onReceivedDelegate };
+                    ListenPara para = new ListenPara() { Group = group, Topic = topic, Event = onReceivedDelegate, IsBroadcast = isBroadcast };
                     ThreadPool.QueueUserWorkItem(new WaitCallback(ListenThread), para);
                     return true;
                 }
@@ -209,9 +184,10 @@ namespace Taurus.Plugin.DistributedTransaction
                 var config = new ConsumerConfig
                 {
                     BootstrapServers = servers,
-                    GroupId = para.Topic,
+                    GroupId = para.Group,
                     EnableAutoCommit = true,
-                    AutoOffsetReset = AutoOffsetReset.Earliest
+                    AutoOffsetReset = AutoOffsetReset.Latest
+                    //AutoOffsetReset = para.IsBroadcast ? AutoOffsetReset.Latest : AutoOffsetReset.Earliest
                 };
                 using (var consumer = new ConsumerBuilder<Ignore, string>(config).Build())
                 {
@@ -222,8 +198,11 @@ namespace Taurus.Plugin.DistributedTransaction
                         try
                         {
                             var consumeResult = consumer.Consume();
-                            para.Message = consumeResult.Value;
-                            ThreadPool.QueueUserWorkItem(new WaitCallback(OnReceive), para);
+                            ListenPara listenPara = new ListenPara();
+                            listenPara.Message = consumeResult.Value;
+                            listenPara.Event = para.Event;
+                            listenPara.Topic = para.Topic;
+                            OnReceive(listenPara);
                         }
                         catch (Exception err)
                         {
@@ -243,9 +222,8 @@ namespace Taurus.Plugin.DistributedTransaction
 
         }
 
-        private void OnReceive(object topicObj)
+        private void OnReceive(ListenPara para)
         {
-            ListenPara para = topicObj as ListenPara;
             MQMsg msg = MQMsg.Create(para.Message);
 
             //反转队列名称和监听key
@@ -255,7 +233,67 @@ namespace Taurus.Plugin.DistributedTransaction
             string subKey = msg.TaskKey;
             msg.TaskKey = msg.CallBackKey;
             msg.CallBackKey = subKey;
+            msg.ExChange = null;
+
             para.Event(msg);
+        }
+
+        static readonly object lockTopicObj = new object();
+        static List<string> topics = new List<string>();
+        /// <summary>
+        /// 获取所有项目Topics
+        /// </summary>
+        public List<string> Topics
+        {
+            get
+            {
+                if (topics.Count == 0)
+                {
+                    lock (lockTopicObj)
+                    {
+                        if (topics.Count == 0)
+                        {
+                            ReSetTopics(servers);
+                        }
+                    }
+                }
+
+                return topics;
+            }
+        }
+
+        /// <summary>
+        /// 更新【获取所有】主题列表
+        /// </summary>
+        private void ReSetTopics(string servers)
+        {
+            try
+            {
+                var config = new AdminClientConfig
+                {
+                    BootstrapServers = servers // Kafka 服务器地址和端口
+                };
+                Metadata metadata;
+                using (var adminClient = new AdminClientBuilder(config).Build())
+                {
+                    metadata = adminClient.GetMetadata(TimeSpan.FromSeconds(10));
+                }
+                if (metadata != null && metadata.Topics != null)
+                {
+                    topics.Clear();
+                    foreach (var topic in metadata.Topics)
+                    {
+                        if (topic.Topic.StartsWith("DTS_") && !topics.Contains(topic.Topic))
+                        {
+                            topics.Add(topic.Topic);
+                        }
+                    }
+                }
+            }
+            catch (Exception err)
+            {
+                CYQ.Data.Log.Write(err, "MQ.Kafka");
+            }
         }
 
         /// <summary>
@@ -266,20 +304,11 @@ namespace Taurus.Plugin.DistributedTransaction
             List<string> topicList = new List<string>();
             try
             {
-                var config = new AdminClientConfig
+                foreach (var topic in Topics)
                 {
-                    BootstrapServers = servers // Kafka 服务器地址和端口
-                };
-                using (var adminClient = new AdminClientBuilder(config).Build())
-                {
-                    var metadata = adminClient.GetMetadata(TimeSpan.FromSeconds(10));
-
-                    foreach (var topic in metadata.Topics)
+                    if (topic.StartsWith(exName))
                     {
-                        if (topic.Topic.EndsWith(exName))
-                        {
-                            topicList.Add(topic.Topic);
-                        }
+                        topicList.Add(topic);
                     }
                 }
             }
@@ -291,6 +320,7 @@ namespace Taurus.Plugin.DistributedTransaction
         }
         private bool CreateTopicIfNoExists(string topic)
         {
+            if (Topics.Contains(topic)) { return true; }
             try
             {
                 var config = new AdminClientConfig
@@ -299,23 +329,34 @@ namespace Taurus.Plugin.DistributedTransaction
                 };
                 using (var adminClient = new AdminClientBuilder(config).Build())
                 {
-                    var metadata = adminClient.GetMetadata(topic, TimeSpan.FromSeconds(10));
-                    if (metadata.Topics[0].Error.IsError)
+                    // 创建主题
+                    var topicSpecification = new TopicSpecification
                     {
-                        // 创建主题
-                        var topicSpecification = new TopicSpecification
-                        {
-                            Name = topic,
-                            NumPartitions = 1,
-                            ReplicationFactor = 1
-                        };
-                        adminClient.CreateTopicsAsync(new[] { topicSpecification }).GetAwaiter().GetResult();
+                        Name = topic,
+                        NumPartitions = 1,
+                        ReplicationFactor = 1
+                    };
+                    adminClient.CreateTopicsAsync(new[] { topicSpecification }).GetAwaiter().GetResult();
+                    //发一条广播，通知大伙，我上线了。
+
+                    if (!topics.Contains(topic))
+                    {
+                        topics.Add(topic);
                     }
+
                 }
                 return true;
             }
             catch (Exception err)
             {
+                if (err.Message.Contains("already exists."))
+                {
+                    if (!topics.Contains(topic))
+                    {
+                        topics.Add(topic);
+                    }
+                    return true;
+                }
                 CYQ.Data.Log.Write(err, "MQ.Kafka");
                 return false;
             }
@@ -324,9 +365,12 @@ namespace Taurus.Plugin.DistributedTransaction
 
         public class ListenPara
         {
+            public string Group { get; set; }
             public string Topic { get; set; }
             public string Message { get; set; }
             public OnReceivedDelegate Event { get; set; }
+            public bool IsBroadcast { get; set; }
+
         }
     }
 

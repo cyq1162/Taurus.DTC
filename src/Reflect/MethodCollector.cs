@@ -38,12 +38,12 @@ namespace Taurus.Plugin.DistributedTransaction
                     #region 服务端订阅
 
 
-                    object[] items = method.GetCustomAttributes(typeof(DTCServerSubscribeAttribute), true);
+                    object[] items = method.GetCustomAttributes(typeof(DTCSubscribeAttribute), true);
                     if (items != null && items.Length > 0)
                     {
                         foreach (var item in items)
                         {
-                            var dtcs = item as DTCServerSubscribeAttribute;
+                            var dtcs = item as DTCSubscribeAttribute;
                             string key = dtcs.SubKey;
                             if (!dicServerMethods.ContainsKey(key))
                             {
@@ -53,12 +53,12 @@ namespace Taurus.Plugin.DistributedTransaction
                     }
                     #endregion
                     #region 客户端订阅
-                    items = method.GetCustomAttributes(typeof(DTCClientCallBackAttribute), true);
+                    items = method.GetCustomAttributes(typeof(DTCCallBackAttribute), true);
                     if (items != null && items.Length > 0)
                     {
                         foreach (var item in items)
                         {
-                            var dtcs = item as DTCClientCallBackAttribute;
+                            var dtcs = item as DTCCallBackAttribute;
                             string key = dtcs.CallBackKey;
                             if (!dicClientMethods.ContainsKey(key))
                             {

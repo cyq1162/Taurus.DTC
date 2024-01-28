@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CYQ.Data;
+using System;
 using System.Diagnostics;
 
 namespace Taurus.Plugin.DistributedTransaction
@@ -8,10 +9,17 @@ namespace Taurus.Plugin.DistributedTransaction
     /// </summary>
     internal class DTCConsole
     {
-        public static void WriteDebugLine(string msg)
+        public static void WriteLine(string msg)
         {
             Console.WriteLine(msg);
             Debug.WriteLine(msg);
+        }
+        public static void WriteDebugLine(string msg)
+        {
+            if (AppConfig.IsDebugMode)
+            {
+                WriteLine(msg);
+            }
         }
     }
 }

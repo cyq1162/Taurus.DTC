@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>Taurus.DTC</AssemblyName>
-    <AssemblyVersion>3.2.1</AssemblyVersion>
-    <FileVersion>3.2.1</FileVersion>
+    <AssemblyVersion>3.3.0</AssemblyVersion>
+    <FileVersion>3.3.0</FileVersion>
     <Authors>路过秋天</Authors>
-    <Company>路过秋天 （2024-01-10）</Company>
+    <Company>路过秋天 （2024-01-29）</Company>
     <Copyright>Copyright ©  路过秋天 2024-2124</Copyright>
 	  <AssemblyTitle>Taurus.DTC 分布式事务框架 .Net Core 版本</AssemblyTitle>
     <Product>Taurus.DTC 分布式事务框架 .NET Core 版本</Product>
@@ -24,28 +24,37 @@
     <Compile Remove="bin\**" />
     <Compile Remove="MQ\Kafka\DotNet\**" />
     <Compile Remove="MQ\Rabbit\DotNet\**" />
+    <Compile Remove="MQ\Rabbit\NetCore\**" />
     <Compile Remove="obj\**" />
+    <Compile Remove="packages\**" />
+    <Compile Remove="Plugin\**" />
     <Compile Remove="Properties\**" />
     <EmbeddedResource Remove="bin\**" />
     <EmbeddedResource Remove="MQ\Kafka\DotNet\**" />
     <EmbeddedResource Remove="MQ\Rabbit\DotNet\**" />
+    <EmbeddedResource Remove="MQ\Rabbit\NetCore\**" />
     <EmbeddedResource Remove="obj\**" />
+    <EmbeddedResource Remove="packages\**" />
+    <EmbeddedResource Remove="Plugin\**" />
     <EmbeddedResource Remove="Properties\**" />
     <None Remove="bin\**" />
     <None Remove="MQ\Kafka\DotNet\**" />
     <None Remove="MQ\Rabbit\DotNet\**" />
+    <None Remove="MQ\Rabbit\NetCore\**" />
     <None Remove="obj\**" />
+    <None Remove="packages\**" />
+    <None Remove="Plugin\**" />
     <None Remove="Properties\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="MQ\Kafka\MQ.Kafka.NoSupport.cs" />
-    <Compile Remove="MQ\Rabbit\NetCore\MQ.Rabbit.cs" />
+    <Compile Remove="MQ\Rabbit\MQ.Rabbit.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Confluent.Kafka" Version="2.3.0" />
-    <PackageReference Include="cyqdatacore" Version="5.9.0" />
+    <PackageReference Include="Taurus.DistributedLock" Version="2.0.1.1" />
   </ItemGroup>
 
 </Project>

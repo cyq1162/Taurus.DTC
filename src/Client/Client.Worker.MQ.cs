@@ -27,6 +27,7 @@ namespace Taurus.Plugin.DistributedTransaction
                     public static void Add(MQMsg msg)
                     {
                         _dtcQueue.Enqueue(msg);
+                        InitQueueListen(null);//允许延时监听
                         if (threadIsWorking) { return; }
                         lock (lockObj)
                         {
@@ -86,20 +87,38 @@ namespace Taurus.Plugin.DistributedTransaction
                             Log.Error(err);
                         }
                     }
-
+                    private static bool hasInitListen = false;
                     public static void InitQueueListen(object p)
                     {
+                        if (hasInitListen) { return; }
                         var mq = MQ.Client;
                         if (mq.MQType != MQType.Empty)
                         {
-                            //对默认对列绑定交换机。
-                            bool isOK = MQ.Client.Listen(DTCConfig.Client.MQ.DefaultQueue, Client.OnReceived, DTCConfig.Client.MQ.DefaultExChange);
-                            DTCConsole.WriteDebugLine("DTC.Client." + mq.MQType + ".Listen : " + DTCConfig.Client.MQ.DefaultQueue + (isOK ? " - OK." : " - Fail."));
-                            isOK = MQ.Client.Listen(DTCConfig.Client.MQ.RetryQueue, Client.OnReceived, DTCConfig.Client.MQ.RetryExChange);
-                            DTCConsole.WriteDebugLine("DTC.Client." + mq.MQType + ".Listen : " + DTCConfig.Client.MQ.RetryQueue + (isOK ? " - OK." : " - Fail."));
-                            isOK = MQ.Client.Listen(DTCConfig.Client.MQ.ConfirmQueue, Client.OnReceived, DTCConfig.Client.MQ.ConfirmExChange);
-                            DTCConsole.WriteDebugLine("DTC.Client." + mq.MQType + ".Listen : " + DTCConfig.Client.MQ.ConfirmQueue + (isOK ? " - OK." : " - Fail."));
+                            hasInitListen = true;
+                            string printMsg = "--------------------------------------------------" + Environment.NewLine;
+                            if (mq.MQType == MQType.Rabbit)
+                            {
+
+                                //对默认对列绑定交换机。
+                                bool isOK = MQ.Client.Listen(DTCConfig.Client.MQ.Rabbit.DefaultQueue, Client.OnReceived, DTCConfig.Client.MQ.Rabbit.DefaultExChange, false);
+                                printMsg+="DTC.Client." + mq.MQType + ".Listen : " + DTCConfig.Client.MQ.Rabbit.DefaultQueue + " - ExChange : " + DTCConfig.Client.MQ.Rabbit.DefaultExChange + (isOK ? " - OK." : " - Fail.")+Environment.NewLine;
+
+                                isOK = MQ.Client.Listen(DTCConfig.Client.MQ.Rabbit.ConfirmQueue, Client.OnReceived, DTCConfig.Client.MQ.Rabbit.ConfirmExChange, false);
+                                printMsg += "DTC.Client." + mq.MQType + ".Listen : " + DTCConfig.Client.MQ.Rabbit.ConfirmQueue + " - ExChange : " + DTCConfig.Client.MQ.Rabbit.ConfirmExChange + (isOK ? " - OK." : " - Fail.") + Environment.NewLine;
+
+                            }
+                            else if (mq.MQType == MQType.Kafka)
+                            {
+                                bool isOK = MQ.Client.Listen(DTCConfig.Client.MQ.Kafka.DefaultTopic, Client.OnReceived, DTCConfig.Client.MQ.Kafka.DefaultGroup, false);
+                                printMsg += "DTC.Client." + mq.MQType + ".Listen : " + DTCConfig.Client.MQ.Kafka.DefaultTopic + " -  Group : " + DTCConfig.Client.MQ.Kafka.DefaultGroup + (isOK ? " - OK." : " - Fail.") + Environment.NewLine;
+
+                                isOK = MQ.Client.Listen(DTCConfig.Client.MQ.Kafka.ConfirmTopic, Client.OnReceived, DTCConfig.Client.MQ.Kafka.ConfirmGroup, false);
+                                printMsg += "DTC.Client." + mq.MQType + ".Listen : " + DTCConfig.Client.MQ.Kafka.ConfirmTopic + " -  Group : " + DTCConfig.Client.MQ.Kafka.ConfirmGroup + (isOK ? " - OK." : " - Fail.") + Environment.NewLine;
+                            }
+                            printMsg += "--------------------------------------------------" + Environment.NewLine;
+                            DTCConsole.WriteLine(printMsg);
                         }
+
                     }
                 }
             }

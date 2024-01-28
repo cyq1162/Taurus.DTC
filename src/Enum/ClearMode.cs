@@ -4,7 +4,10 @@ using System.Text;
 
 namespace Taurus.Plugin.DistributedTransaction
 {
-    public enum TableClearMode
+    /// <summary>
+    /// 事务数据清除模式，仅对数据库有效，非数据库模式都是直接Delete模式。
+    /// </summary>
+    public enum ClearMode
     {
         /// <summary>
         /// 删除数据
@@ -13,6 +16,6 @@ namespace Taurus.Plugin.DistributedTransaction
         /// <summary>
         /// 转移到历史表
         /// </summary>
-        MoveToNewTable = 1
+        MoveToHistoryTable = 1
     }
 }

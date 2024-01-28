@@ -15,7 +15,7 @@ namespace Taurus.Plugin.DistributedTransaction
         }
         public override MQType MQType =>  MQType.Kafka;
 
-        public override bool Listen(string queueNameOrGroupName, OnReceivedDelegate onReceivedDelegate, string bindExNameOrTopicName)
+        public override bool Listen(string queueOrTopic, OnReceivedDelegate onReceivedDelegate, string exNameOrGroup, bool isAutoDelete)
         {
             throw new System.NotImplementedException();
         }

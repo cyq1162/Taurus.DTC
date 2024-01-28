@@ -1,8 +1,9 @@
 ﻿using CYQ.Data.Json;
-using CYQ.Data.Lock;
+using CYQ.Data.Tool;
 using System;
 using System.Reflection;
 using System.Web;
+using Taurus.Plugin.DistributedLock;
 
 namespace Taurus.Plugin.DistributedTransaction
 {
@@ -27,106 +28,99 @@ namespace Taurus.Plugin.DistributedTransaction
             /// <summary>
             /// 提交事务确认
             /// </summary>
-            /// <param name="num">需要确认的数量</param>
-            public static bool CommitAsync(int num)
+            /// <param name="requestNum">需要确认的数量</param>
+            public static bool CommitAsync(int requestNum)
             {
-                return ExeAsync(ExeType.Commit, null, null, null, num);
+                return ExeAsync(ExeType.Commit, null, null, null, requestNum);
             }
 
             /// <summary>
             /// 提交事务确认
             /// </summary>
-            /// <param name="num">需要确认的数量</param>
+            /// <param name="requestNum">需要确认的数量</param>
             /// <param name="callBackKey">如果需要接收回调通知，指定本回调key，回调方法用 DTCClientCallBack 特性标注</param>
-            public static bool CommitAsync(int num, string callBackKey)
+            public static bool CommitAsync(int requestNum, string callBackKey)
             {
-                return ExeAsync(ExeType.Commit, null, null, callBackKey, num);
+                return ExeAsync(ExeType.Commit, null, null, callBackKey, requestNum);
             }
 
             /// <summary>
             /// 提交事务确认
             /// </summary>
-            /// <param name="num">需要确认的数量</param>
+            /// <param name="requestNum">需要确认的数量</param>
             /// <param name="callBackKey">如果需要接收回调通知，指定本回调key，回调方法用 DTCClientCallBack 特性标注</param>
             /// <param name="content">传递的信息</param>
-            public static bool CommitAsync(int num, string callBackKey, string content)
+            public static bool CommitAsync(int requestNum, string callBackKey, string content)
             {
-                return ExeAsync(ExeType.Commit, content, null, callBackKey, num);
+                return ExeAsync(ExeType.Commit, content, null, callBackKey, requestNum);
             }
             /// <summary>
             /// 提交事务回滚
             /// </summary>
-            /// <param name="num">需要回滚的数量</param>
-            public static bool RollBackAsync(int num)
+            /// <param name="requestNum">需要回滚的数量</param>
+            public static bool RollBackAsync(int requestNum)
             {
-                return ExeAsync(ExeType.RollBack, null, null, null, num);
+                return ExeAsync(ExeType.RollBack, null, null, null, requestNum);
             }
             /// <summary>
             /// 提交事务回滚
             /// </summary>
-            /// <param name="num">需要回滚的数量</param>
+            /// <param name="requestNum">需要回滚的数量</param>
             /// <param name="callBackKey">如果需要接收回调通知，指定本回调key，回调方法用 DTCClientCallBack 特性标注</param>
-            public static bool RollBackAsync(int num, string callBackKey)
+            public static bool RollBackAsync(int requestNum, string callBackKey)
             {
-                return ExeAsync(ExeType.RollBack, null, null, callBackKey, num);
+                return ExeAsync(ExeType.RollBack, null, null, callBackKey, requestNum);
             }
 
             /// <summary>
             /// 提交事务回滚
             /// </summary>
-            /// <param name="num">需要回滚的数量</param>
+            /// <param name="requestNum">需要回滚的数量</param>
             /// <param name="callBackKey">如果需要接收回调通知，指定本回调key，回调方法用 DTCClientCallBack 特性标注</param>
             /// <param name="content">传递的信息</param>
-            public static bool RollBackAsync(int num, string callBackKey, string content)
+            public static bool RollBackAsync(int requestNum, string callBackKey, string content)
             {
-                return ExeAsync(ExeType.RollBack, content, null, callBackKey, num);
-            }
-            /// <summary>
-            /// 发起一个任务消息
-            /// </summary>
-            /// <param name="content">传递的信息</param>
-            /// <param name="taskKey">指定任务key，即Server方监听的subKey</param>
-            public static bool PublishTaskAsync(string content, string taskKey)
-            {
-                return ExeAsync(ExeType.Task, content, taskKey, null, 1);
-            }
-            /// <summary>
-            /// 发起一个任务消息
-            /// </summary>
-            /// <param name="content">传递的信息</param>
-            /// <param name="taskKey">指定任务key，即Server方监听的subKey</param>
-            /// <param name="callBackKey">如果需要接收回调通知，指定本回调key，回调方法用 DTCClientCallBack 特性标注</param>
-            public static bool PublishTaskAsync(string content, string taskKey, string callBackKey)
-            {
-                return ExeAsync(ExeType.Task, content, taskKey, callBackKey, 1);
+                return ExeAsync(ExeType.RollBack, content, null, callBackKey, requestNum);
             }
 
-            private static bool ExeAsync(ExeType exeType, string content, string taskKey, string callBackKey, int confirmNum)
+            private static bool ExeAsync(ExeType exeType, string content, string taskKey, string callBackKey, int requestNum)
             {
+                if (System.Web.HttpContext.Current == null)
+                {
+                    throw new Exception("HttpContext.Current is null.");
+                }
                 Table table = new Table();
+                table.TraceID = HttpContext.Current.GetTraceID();
                 table.ExeType = exeType.ToString();
                 table.Content = content;
                 table.TaskKey = taskKey;
                 table.CallBackKey = callBackKey;
-                table.ConfirmNum = confirmNum;
+                table.RequestNum = Math.Max(1, requestNum);
                 table.CreateTime = DateTime.Now;
                 table.EditTime = DateTime.Now;
                 table.Retries = 0;
-                if (System.Web.HttpContext.Current == null)
+
+                if (!Worker.Save(table))
                 {
-                    if (exeType == ExeType.Commit || exeType == ExeType.RollBack)
-                    {
-                        string msg = "HttpContext.Current is null.";
-                        throw new Exception(msg);
-                    }
+                    return false;
                 }
-                else
+                MQMsg msg = table.ToMQMsg();
+                switch (MQ.Client.MQType)
                 {
-                    table.TraceID = HttpContext.Current.GetTraceID();
+                    case MQType.Rabbit:
+                        msg.ExChange = DTCConfig.Server.MQ.Rabbit.DefaultExChange;
+                        msg.CallBackName = DTCConfig.Client.MQ.Rabbit.DefaultQueue;
+                        break;
+                    case MQType.Kafka:
+                        msg.QueueName = DTCConfig.Server.MQ.Kafka.DefaultTopic;
+                        msg.CallBackName = DTCConfig.Client.MQ.Kafka.DefaultTopic;
+                        break;
+                    default:
+                        return true;
                 }
-                table.ExChange = DTCConfig.Server.MQ.DefaultExChange;
-                table.CallBackName = DTCConfig.Client.MQ.DefaultQueue;
-                return Worker.Add(table);
+
+                Worker.Add(msg);
+                return true;
             }
 
             #endregion
@@ -139,20 +133,24 @@ namespace Taurus.Plugin.DistributedTransaction
             internal static void OnReceived(MQMsg msg)
             {
                 Log.Print("MQ.OnReceived : " + msg.ToJson());
-                DTCConsole.WriteDebugLine("Client.MQ.OnReceived : " + msg.MsgID + " - " + msg.ExeType);
-                var localLock = DistributedLock.Local;
+                var localLock = DLock.Local;
                 string key = "DTC.Client." + msg.MsgID;
                 bool isLockOK = false;
                 try
                 {
-                    isLockOK = localLock.Lock(key, 1000);
-                    if (msg.ExeType == ExeType.Task.ToString())
+                    isLockOK = localLock.Lock(key, 1);
+                    if (isLockOK)
                     {
-                        OnDoTask(msg);
+                        string printMsg = "-------------------Client " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "------------------------------" + Environment.NewLine;
+                        bool isFirstAck = !msg.IsFirstAck.HasValue || msg.IsFirstAck.Value;
+                        printMsg += "Client.MQ.OnReceived : " + msg.TraceID + "[" + msg.MsgID + "] - " + msg.ExeType + (isFirstAck ? " - FirstAck" : "") + " - NextTo :" + msg.QueueName + Environment.NewLine;
+                        OnCommitOrRollBack(msg, ref printMsg);
+                        printMsg += "-------------------------------------------------------------------------------" + Environment.NewLine;
+                        DTCConsole.WriteDebugLine(printMsg);
                     }
-                    else if (msg.ExeType == ExeType.Commit.ToString() || msg.ExeType == ExeType.RollBack.ToString())
+                    else
                     {
-                        OnCommitOrRollBack(msg);
+
                     }
                 }
                 catch (Exception err)
@@ -168,75 +166,9 @@ namespace Taurus.Plugin.DistributedTransaction
                 }
             }
 
-
-
-            private static void OnDoTask(MQMsg msg)
+            private static void OnCommitOrRollBack(MQMsg msg, ref string printMsg)
             {
-                if (!(msg.IsFirstAck.HasValue && msg.IsFirstAck.Value) || (msg.IsDeleteAck.HasValue && msg.IsDeleteAck.Value))
-                {
-                    DoTaskConfirm(msg);
-                    return;
-                }
-
-                if (!string.IsNullOrEmpty(msg.CallBackKey))
-                {
-                    #region 执行方法
-
-                    MethodInfo method = MethodCollector.GetClientMethod(msg.CallBackKey);
-                    if (method != null)
-                    {
-                        try
-                        {
-                            DTCClientCallBackPara para = new DTCClientCallBackPara(msg);
-                            object obj = method.IsStatic ? null : Activator.CreateInstance(method.DeclaringType);
-                            object invokeResult = method.Invoke(obj, new object[] { para });
-                            if (invokeResult is bool && !(bool)invokeResult) { return; }
-                            Log.Print("Execute." + msg.ExeType + ".CallBack.Method : " + method.Name);
-                            DTCConsole.WriteDebugLine("Client.Execute." + msg.ExeType + ".CallBack.Method : " + method.Name);
-                        }
-                        catch (Exception err)
-                        {
-                            Log.Error(err);
-                            return;
-                        }
-                    }
-                    #endregion
-                }
-                DoTaskConfirm(msg);
-            }
-
-            private static void DoTaskConfirm(MQMsg msg)
-            {
-                bool isUpdateOK = false;
-                using (Table table = new Table())
-                {
-                    table.ConfirmState = 1;
-                    table.EditTime = DateTime.Now;
-                    isUpdateOK = table.Update(msg.MsgID);
-                    if (isUpdateOK)
-                    {
-                        //DTCLog.WriteDebugLine("Client.OnDoTask 首次更新数据表。");
-                    }
-                    else if (Worker.IO.Delete(msg.TraceID, msg.MsgID, msg.ExeType))
-                    {
-                        isUpdateOK = true;
-                        //DTCLog.WriteDebugLine("Client.OnDoTask 首次删除缓存：" + msg.MsgID);
-                    }
-                }
-
-                //这边已经删除数据，告诉对方，也可以删除数据了。
-                if (isUpdateOK || (msg.IsDeleteAck.HasValue && msg.IsDeleteAck.Value))
-                {
-                    msg.SetDeleteAsk();
-                    Worker.MQPublisher.Add(msg);
-                    //DTCLog.WriteDebugLine("Client.OnDoTask IsDeleteAck=true，让服务端确认及删除掉缓存。");
-                }
-            }
-
-
-            private static void OnCommitOrRollBack(MQMsg msg)
-            {
-                if (!(msg.IsFirstAck.HasValue && msg.IsFirstAck.Value) || (msg.IsDeleteAck.HasValue && msg.IsDeleteAck.Value))
+                if (!(!msg.IsFirstAck.HasValue || msg.IsFirstAck.Value) || (msg.IsDeleteAck.HasValue && msg.IsDeleteAck.Value))
                 {
                     CommitOrRollBackConfirm(msg);
                     return;
@@ -249,12 +181,12 @@ namespace Taurus.Plugin.DistributedTransaction
                     {
                         try
                         {
-                            DTCClientCallBackPara para = new DTCClientCallBackPara(msg);
+                            DTCCallBackPara para = new DTCCallBackPara(msg);
                             object obj = method.IsStatic ? null : Activator.CreateInstance(method.DeclaringType);
                             object invokeResult = method.Invoke(obj, new object[] { para });
                             if (invokeResult is bool && !(bool)invokeResult) { return; }
                             Log.Print("Execute." + msg.ExeType + ".CallBack.Method : " + method.Name);
-                            DTCConsole.WriteDebugLine("Client.Execute." + msg.ExeType + ".CallBack.Method : " + method.Name);
+                            printMsg += "Client.Execute." + msg.ExeType + ".CallBack.Method : " + method.Name + Environment.NewLine;
                         }
                         catch (Exception err)
                         {
@@ -279,7 +211,7 @@ namespace Taurus.Plugin.DistributedTransaction
                         if (string.IsNullOrEmpty(table.Content))
                         {
                             table.Content = msg.MsgID;
-                            if (!table.ConfirmNum.HasValue || table.ConfirmNum.Value <= 1)
+                            if (!table.RequestNum.HasValue || table.RequestNum.Value <= 1)
                             {
                                 table.ConfirmState = 1;
                                 isConfirm = true;
@@ -293,7 +225,7 @@ namespace Taurus.Plugin.DistributedTransaction
                         else if (!table.Content.Contains(msg.MsgID))
                         {
                             table.Content += "," + msg.MsgID;
-                            if (!table.ConfirmNum.HasValue || table.ConfirmNum.Value <= table.Content.Split(',').Length)
+                            if (!table.RequestNum.HasValue || table.RequestNum.Value <= table.Content.Split(',').Length)
                             {
                                 table.ConfirmState = 1;
                                 isConfirm = true;
@@ -307,7 +239,7 @@ namespace Taurus.Plugin.DistributedTransaction
                     }
                     if (!isConfirm)
                     {
-                        string json = Worker.IO.Read(msg.TraceID, msg.MsgID, msg.ExeType);
+                        string json = Worker.IO.Read(msg.TraceID, msg.ExeType);
                         if (!string.IsNullOrEmpty(json))
                         {
                             var tb = JsonHelper.ToEntity<Table>(json);
@@ -316,15 +248,15 @@ namespace Taurus.Plugin.DistributedTransaction
                                 if (string.IsNullOrEmpty(tb.Content))
                                 {
                                     tb.Content = msg.MsgID;
-                                    if (!tb.ConfirmNum.HasValue || tb.ConfirmNum.Value <= 1)
+                                    if (!tb.RequestNum.HasValue || tb.RequestNum.Value <= 1)
                                     {
                                         isConfirm = true;
                                     }
                                 }
-                                else if (!table.Content.Contains(msg.MsgID))
+                                else if (!tb.Content.Contains(msg.MsgID))
                                 {
-                                    table.Content += "," + msg.MsgID;
-                                    if (!tb.ConfirmNum.HasValue || table.ConfirmNum.Value <= table.Content.Split(',').Length)
+                                    tb.Content += "," + msg.MsgID;
+                                    if (!tb.RequestNum.HasValue || tb.RequestNum.Value <= tb.Content.Split(',').Length)
                                     {
                                         isConfirm = true;
                                     }
@@ -340,7 +272,7 @@ namespace Taurus.Plugin.DistributedTransaction
                     #endregion
                     if (isConfirm)
                     {
-                        if (Worker.IO.Delete(msg.TraceID, msg.TraceID, msg.ExeType))
+                        if (Worker.IO.Delete(msg.TraceID, msg.ExeType))
                         {
                             //DTCLog.WriteDebugLine("Client.OnCommitOrRollBack 删除缓存。");
                         }

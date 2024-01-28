@@ -73,7 +73,14 @@ namespace Taurus.Plugin.DistributedTransaction
         public abstract MQType MQType { get; }
         public abstract bool Publish(MQMsg msg);
         public abstract bool PublishBatch(List<MQMsg> msgList);
-        public abstract bool Listen(string queueNameOrGroupName, OnReceivedDelegate onReceivedDelegate, string bindExNameOrTopicName);
+        /// <summary>
+        /// 监听队列
+        /// </summary>
+        /// <param name="queueOrTopic">Rabbit：队列名；Kafka：主题名称</param>
+        /// <param name="exNameOrGroup">Rabbit：交换机；Kafka：监听组名</param>
+        /// <param name="isAutoDelete">Rabbit：是否临时队列，应用关闭时自动删除队列；Rabbit：此参数无效。</param>
+        /// <returns></returns>
+        public abstract bool Listen(string queueOrTopic, OnReceivedDelegate onReceivedDelegate, string exNameOrGroup, bool isAutoDelete);
     }
 
     internal class Empty : MQ
@@ -88,7 +95,7 @@ namespace Taurus.Plugin.DistributedTransaction
             }
         }
 
-        public override bool Listen(string queueName, OnReceivedDelegate onReceivedDelegate, string bindExName)
+        public override bool Listen(string queueName, OnReceivedDelegate onReceivedDelegate, string bindExName, bool isAutoDelete)
         {
             return false;
         }

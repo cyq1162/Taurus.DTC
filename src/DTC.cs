@@ -1,11 +1,13 @@
 ﻿using CYQ.Data;
 using System;
+//using Taurus.Plugin.Admin;
 
 
 namespace Taurus.Plugin.DistributedTransaction
 {
     /// <summary>
-    /// DTC 运行启动
+    /// DTC 分布式事务协调器，Distributed Transaction Coordinator
+    /// DTC 分布式任务协调器，Distributed Task Coordinator
     /// </summary>
     public partial class DTC
     {
@@ -33,7 +35,10 @@ namespace Taurus.Plugin.DistributedTransaction
             {
                 if (DTCConfig.Client.IsEnable)
                 {
+                    //DTCAdminController.Init();
+                    DTCConsole.WriteDebugLine("--------------------------------------------------");
                     DTCConsole.WriteDebugLine("DTC.Client.Start = true , Version = "+ Version);
+                    DTCConsole.WriteDebugLine("--------------------------------------------------");
                     DTC.Client.Worker.DBScanner.Start();
                 }
             }
@@ -46,7 +51,10 @@ namespace Taurus.Plugin.DistributedTransaction
             {
                 if (DTCConfig.Server.IsEnable)
                 {
+                    //DTCAdminController.Init();
+                    DTCConsole.WriteDebugLine("--------------------------------------------------");
                     DTCConsole.WriteDebugLine("DTC.Server.Start = true , Version = "+ Version);
+                    DTCConsole.WriteDebugLine("--------------------------------------------------");
                     DTC.Server.Worker.DBScanner.Start();
                 }
             }
@@ -57,10 +65,8 @@ namespace Taurus.Plugin.DistributedTransaction
         /// </summary>
         public static void Start()
         {
-            DTCConsole.WriteDebugLine("--------------------------------------------------");
             Client.Start();
             Server.Start();
-            DTCConsole.WriteDebugLine("--------------------------------------------------");
         }
     }
 

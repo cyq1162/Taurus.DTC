@@ -39,33 +39,34 @@ namespace Taurus.Plugin.DistributedTransaction
                         _ID = value;
                     }
                 }
-                private string _MsgID;
-                /// <summary>
-                /// 队列消息ID
-                /// </summary>
-                [Length(36)]
-                [Key(false, true, false)]
-                public string MsgID
-                {
-                    get
-                    {
-                        if (string.IsNullOrEmpty(_MsgID))
-                        {
-                            _MsgID = Guid.NewGuid().ToString();
-                        }
-                        return _MsgID;
-                    }
-                    set
-                    {
-                        _MsgID = value;
-                    }
-                }
+                //private string _MsgID;
+                ///// <summary>
+                ///// 队列消息ID
+                ///// </summary>
+                //[Length(36)]
+                
+                //public string MsgID
+                //{
+                //    get
+                //    {
+                //        if (string.IsNullOrEmpty(_MsgID))
+                //        {
+                //            _MsgID = Guid.NewGuid().ToString();
+                //        }
+                //        return _MsgID;
+                //    }
+                //    set
+                //    {
+                //        _MsgID = value;
+                //    }
+                //}
 
                 private string _TraceID;
                 /// <summary>
                 /// 分布式追踪ID
                 /// </summary>
                 [Length(50)]
+                [Key(false, true, false)]
                 public string TraceID
                 {
                     get
@@ -77,38 +78,38 @@ namespace Taurus.Plugin.DistributedTransaction
                         _TraceID = value;
                     }
                 }
-                private string _ExChange;
-                /// <summary>
-                /// 发送交换机名称
-                /// </summary>
-                [Length(50)]
-                public string ExChange
-                {
-                    get { return _ExChange; }
-                    set { _ExChange = value; }
-                }
+                //private string _ExChange;
+                ///// <summary>
+                ///// 发送交换机名称
+                ///// </summary>
+                //[Length(50)]
+                //public string ExChange
+                //{
+                //    get { return _ExChange; }
+                //    set { _ExChange = value; }
+                //}
 
-                private string _QueueName;
-                /// <summary>
-                /// 发送队列名称
-                /// </summary>
-                [Length(50)]
-                public string QueueName
-                {
-                    get { return _QueueName; }
-                    set { _QueueName = value; }
-                }
+                //private string _QueueName;
+                ///// <summary>
+                ///// 发送队列名称
+                ///// </summary>
+                //[Length(50)]
+                //public string QueueName
+                //{
+                //    get { return _QueueName; }
+                //    set { _QueueName = value; }
+                //}
 
-                private string _CallBackName;
-                /// <summary>
-                /// 队列监听名称
-                /// </summary>
-                [Length(50)]
-                public string CallBackName
-                {
-                    get { return _CallBackName; }
-                    set { _CallBackName = value; }
-                }
+                //private string _CallBackName;
+                ///// <summary>
+                ///// 队列监听名称
+                ///// </summary>
+                //[Length(50)]
+                //public string CallBackName
+                //{
+                //    get { return _CallBackName; }
+                //    set { _CallBackName = value; }
+                //}
 
                 private string _TaskKey;
                 /// <summary>
@@ -136,7 +137,7 @@ namespace Taurus.Plugin.DistributedTransaction
                 /// <summary>
                 /// 写入内容
                 /// </summary>
-                [Length(2000)]
+                [Length(360)]
                 public string Content
                 {
                     get { return _Content; }
@@ -192,20 +193,20 @@ namespace Taurus.Plugin.DistributedTransaction
                     }
                 }
 
-                private int? _ConfirmNum;
+                private int? _RequestNum;
                 /// <summary>
-                /// 事务需要确认数量
+                /// 事务发起请求数量
                 /// </summary>
                 [DefaultValue(1)]
-                public int? ConfirmNum
+                public int? RequestNum
                 {
                     get
                     {
-                        return _ConfirmNum;
+                        return _RequestNum;
                     }
                     set
                     {
-                        _ConfirmNum = value;
+                        _RequestNum = value;
                     }
                 }
                 private DateTime? _CreateTime;
@@ -247,11 +248,11 @@ namespace Taurus.Plugin.DistributedTransaction
                 public MQMsg ToMQMsg()
                 {
                     MQMsg msg = new MQMsg();
-                    msg.MsgID = this.MsgID;
+                    //msg.MsgID = this.MsgID;
                     msg.Content = this.Content;
-                    msg.QueueName = this.QueueName;
-                    msg.CallBackName = this.CallBackName;
-                    msg.ExChange = this.ExChange;
+                    //msg.QueueName = this.QueueName;
+                    //msg.CallBackName = this.CallBackName;
+                    //msg.ExChange = this.ExChange;
                     msg.ExeType = this.ExeType;
                     msg.TraceID = this.TraceID;
                     msg.TaskKey = this.TaskKey;
@@ -265,23 +266,24 @@ namespace Taurus.Plugin.DistributedTransaction
                     {
                         js.Add("ID", this.ID.Value);
                     }
-                    js.Add("MsgID", this.MsgID);
-                    if (this.TraceID != null)
-                    {
-                        js.Add("TraceID", this.TraceID);
-                    }
-                    if (this.ExChange != null)
-                    {
-                        js.Add("ExChange", this.ExChange);
-                    }
-                    if (this.QueueName != null)
-                    {
-                        js.Add("QueueName", this.QueueName);
-                    }
-                    if (this.CallBackName != null)
-                    {
-                        js.Add("CallBackName", this.CallBackName);
-                    }
+                    js.Add("TraceID", this.TraceID);
+                    //js.Add("MsgID", this.MsgID);
+                    //if (this.TraceID != null)
+                    //{
+                        
+                    //}
+                    //if (this.ExChange != null)
+                    //{
+                    //    js.Add("ExChange", this.ExChange);
+                    //}
+                    //if (this.QueueName != null)
+                    //{
+                    //    js.Add("QueueName", this.QueueName);
+                    //}
+                    //if (this.CallBackName != null)
+                    //{
+                    //    js.Add("CallBackName", this.CallBackName);
+                    //}
                     if (this.Content != null)
                     {
                         js.Add("Content", this.Content);
@@ -305,6 +307,10 @@ namespace Taurus.Plugin.DistributedTransaction
                     if (this.ConfirmState.HasValue)
                     {
                         js.Add("ConfirmState", this.ConfirmState.Value);
+                    }
+                    if (this.RequestNum.HasValue)
+                    {
+                        js.Add("RequestNum", this.RequestNum.Value);
                     }
                     if (this.CreateTime.HasValue)
                     {
