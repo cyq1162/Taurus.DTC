@@ -16,7 +16,7 @@ namespace Taurus.Plugin.DistributedTransaction
         }
         public static void WriteDebugLine(string msg)
         {
-            if (AppConfig.IsDebugMode)
+            if (AppConfig.IsDebugMode || (DTCConfig.Server.IsEnable && DTCConfig.Server.IsPrintTraceLog) || (DTCConfig.Client.IsEnable && DTCConfig.Client.IsPrintTraceLog))
             {
                 WriteLine(msg);
             }

@@ -58,22 +58,22 @@ namespace Taurus.Plugin.DistributedTransaction
                 //这里不能加锁：同一个TraceID，调用了同一台电脑，不同的项目接口。
                 try
                 {
-                    Log.Print("MQ.OnReceived : " + msg.ToJson());
-                    DTCConsole.WriteDebugLine("-------------------Server ：" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "-------------------------");
-                    bool isDeleteAck = msg.IsDeleteAck.HasValue && msg.IsDeleteAck.Value;
-                    string printMsg = "Server.MQ.OnReceived : " + msg.TraceID + " - " + msg.ExeType + " - " + (isDeleteAck ? " - DeleteAck" : "") + " - NextTo :" + msg.QueueName;
-                    DTCConsole.WriteDebugLine(printMsg);
-                    OnCommitOrRollBack(msg);
-                    if (isDeleteAck)
+                    string printMsg = "-------------------Server " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + " - " + msg.ExeType + " --------------------" + Environment.NewLine;
+
+                    printMsg += "Server.MQ.OnReceived : " + msg.TraceID + Environment.NewLine;
+                    OnCommitOrRollBack(msg, ref printMsg);
+                    if (msg.IsDeleteAck.HasValue && msg.IsDeleteAck.Value)
                     {
                         //打印分隔线，以便查看
-                        DTCConsole.WriteDebugLine("-------------------Server ：" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + " - END -----------------------");
+                        printMsg += "-------------------Server " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + " - END -----------------------" + Environment.NewLine;
                     }
                     else
                     {
                         //打印分隔线，以便查看
-                        DTCConsole.WriteDebugLine("-------------------------------------------------------------------------------");
+                        printMsg += "-------------------Server " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + " ------------------------------" + Environment.NewLine;
                     }
+                    DTCConsole.WriteDebugLine(printMsg);
+                    Log.Print(printMsg);
                 }
                 catch (Exception err)
                 {
@@ -88,7 +88,7 @@ namespace Taurus.Plugin.DistributedTransaction
 
             #region 事务提交或回滚
 
-            private static void OnCommitOrRollBack(MQMsg msg)
+            private static void OnCommitOrRollBack(MQMsg msg, ref string printMsg)
             {
                 if (msg.IsDeleteAck.HasValue && msg.IsDeleteAck.Value)
                 {
@@ -110,30 +110,40 @@ namespace Taurus.Plugin.DistributedTransaction
                 }
 
                 List<Table> tables = GetTableList(msg);
-                if (tables == null || tables.Count == 0) { return; }
+                if (tables == null || tables.Count == 0)
+                {
+                    printMsg += "No items for process, return directly." + Environment.NewLine;
+                    msg.IsDeleteAck = true;
+                    return;
+                }
 
                 foreach (Table item in tables)
                 {
                     msg.MsgID = item.MsgID;
                     if (item.ConfirmState.HasValue && item.ConfirmState.Value > 0)
                     {
+                        printMsg += (msg.MsgID + " Processed, return directly." + Environment.NewLine);
                         msg.IsFirstAck = false;
                         Worker.MQPublisher.Add(msg);
-                        //DTCLog.WriteDebugLine("Server.OnCommitOrRollBack 方法已执行过，直接回应MQ。");
+                        printMsg += "NextTo :" + msg.QueueName + Environment.NewLine;
                         continue;
                     }
                     string returnContent = null;
                     try
                     {
                         MethodInfo method = MethodCollector.GetServerMethod(item.CallBackKey);
-                        if (method == null) { continue; }
+                        if (method == null)
+                        {
+                            printMsg += ("No callback method for execute, return directly." + Environment.NewLine);
+                            continue;
+                        }
                         DTCSubscribePara para = new DTCSubscribePara(msg);
                         object obj = method.IsStatic ? null : Activator.CreateInstance(method.DeclaringType);
                         object result = method.Invoke(obj, new object[] { para });
                         if (result is bool && !(bool)result) { continue; }
                         returnContent = para.CallBackContent;
-                        Log.Print("Execute." + msg.ExeType + ".Subscribe.Method : " + method.Name);
-                        DTCConsole.WriteDebugLine("Server.Execute." + msg.ExeType + ".Subscribe.Method : " + method.Name);
+                        printMsg += "Server.Execute." + msg.ExeType + ".Subscribe.Method : " + method.Name + Environment.NewLine;
+                        printMsg += "NextTo :" + msg.QueueName + Environment.NewLine;
                     }
                     catch (Exception err)
                     {
@@ -143,7 +153,7 @@ namespace Taurus.Plugin.DistributedTransaction
                     msg.IsFirstAck = true;
                     msg.Content = returnContent;
                     Worker.MQPublisher.Add(msg.Clone());
-
+                    
                     item.TaskKey = msg.TaskKey;
                     item.ExeType = msg.ExeType;
                     item.ConfirmState = 1;

@@ -62,8 +62,9 @@ namespace Taurus.Plugin.DistributedTransaction
                                     {
                                         if (MQ.Client.PublishBatch(mQMsgs))
                                         {
-                                            Log.Print("MQ.Publish : " + mQMsgs.Count + " items.");
-                                            DTCConsole.WriteDebugLine("Client.MQ.Publish : " + mQMsgs.Count + " items.");
+                                            string printMsg = "Client.MQ.Publish : " + mQMsgs.Count + " items.";
+                                            Log.Print(printMsg);
+                                            DTCConsole.WriteDebugLine(printMsg);
                                         }
                                         mQMsgs.Clear();
                                     }

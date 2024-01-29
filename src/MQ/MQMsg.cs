@@ -51,7 +51,7 @@ namespace Taurus.Plugin.DistributedTransaction
         /// <summary>
         /// 设置成响应删除状态，同时减少不需要传递用的数据。
         /// </summary>
-        internal void SetDeleteAsk()
+        internal void SetDeleteAsk(bool isNeedCallBack)
         {
             IsDeleteAck = true;
             Content = null;
@@ -59,6 +59,10 @@ namespace Taurus.Plugin.DistributedTransaction
             CallBackKey = null;
             ExChange = null;
             IsFirstAck = null;
+            if (!isNeedCallBack)
+            {
+                CallBackName = null;
+            }
         }
 
         /// <summary>
@@ -128,14 +132,14 @@ namespace Taurus.Plugin.DistributedTransaction
             MQMsg msg = new MQMsg();
             msg.ExChange = this.ExChange;
             msg.QueueName = this.QueueName;
-            msg.IsFirstAck=this.IsFirstAck;
-            msg.CallBackKey=this.CallBackKey;
-            msg.CallBackName=this.CallBackName;
+            msg.IsFirstAck = this.IsFirstAck;
+            msg.CallBackKey = this.CallBackKey;
+            msg.CallBackName = this.CallBackName;
             msg.Content = this.Content;
             msg.ExeType = this.ExeType;
-            msg.IsDeleteAck=this.IsDeleteAck;
+            msg.IsDeleteAck = this.IsDeleteAck;
             msg.TaskKey = this.TaskKey;
-            msg.TraceID=this.TraceID;
+            msg.TraceID = this.TraceID;
             msg.MsgID = this.MsgID;
             return msg;
         }

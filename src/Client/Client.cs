@@ -132,7 +132,7 @@ namespace Taurus.Plugin.DistributedTransaction
             /// </summary>
             internal static void OnReceived(MQMsg msg)
             {
-                Log.Print("MQ.OnReceived : " + msg.ToJson());
+
                 var localLock = DLock.Local;
                 string key = "DTC.Client." + msg.MsgID;
                 bool isLockOK = false;
@@ -141,12 +141,12 @@ namespace Taurus.Plugin.DistributedTransaction
                     isLockOK = localLock.Lock(key, 1);
                     if (isLockOK)
                     {
-                        string printMsg = "-------------------Client " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "------------------------------" + Environment.NewLine;
+                        string printMsg = "-------------------Client " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + " - " + msg.ExeType + " --------------------" + Environment.NewLine;
                         bool isFirstAck = !msg.IsFirstAck.HasValue || msg.IsFirstAck.Value;
-                        printMsg += "Client.MQ.OnReceived : " + msg.TraceID + "[" + msg.MsgID + "] - " + msg.ExeType + (isFirstAck ? " - FirstAck" : "") + " - NextTo :" + msg.QueueName + Environment.NewLine;
+                        printMsg += "Client.MQ.OnReceived : " + msg.TraceID + "[" + msg.MsgID + "]" + Environment.NewLine;
                         OnCommitOrRollBack(msg, ref printMsg);
-                        printMsg += "-------------------------------------------------------------------------------" + Environment.NewLine;
                         DTCConsole.WriteDebugLine(printMsg);
+                        Log.Print(printMsg);
                     }
                     else
                     {
@@ -170,35 +170,39 @@ namespace Taurus.Plugin.DistributedTransaction
             {
                 if (!(!msg.IsFirstAck.HasValue || msg.IsFirstAck.Value) || (msg.IsDeleteAck.HasValue && msg.IsDeleteAck.Value))
                 {
-                    CommitOrRollBackConfirm(msg);
+                    CommitOrRollBackConfirm(msg, ref printMsg);
                     return;
                 }
 
-                if (!string.IsNullOrEmpty(msg.CallBackKey))
+
+                MethodInfo method = MethodCollector.GetClientMethod(msg.CallBackKey);
+                if (method != null)
                 {
-                    MethodInfo method = MethodCollector.GetClientMethod(msg.CallBackKey);
-                    if (method != null)
+                    try
                     {
-                        try
-                        {
-                            DTCCallBackPara para = new DTCCallBackPara(msg);
-                            object obj = method.IsStatic ? null : Activator.CreateInstance(method.DeclaringType);
-                            object invokeResult = method.Invoke(obj, new object[] { para });
-                            if (invokeResult is bool && !(bool)invokeResult) { return; }
-                            Log.Print("Execute." + msg.ExeType + ".CallBack.Method : " + method.Name);
-                            printMsg += "Client.Execute." + msg.ExeType + ".CallBack.Method : " + method.Name + Environment.NewLine;
-                        }
-                        catch (Exception err)
-                        {
-                            Log.Error(err);
-                            return;
-                        }
+                        //var dele= method.CreateDelegate(method.ReturnType);
+                        //dele.DynamicInvoke(msg, null);
+                        DTCCallBackPara para = new DTCCallBackPara(msg);
+                        object obj = method.IsStatic ? null : Activator.CreateInstance(method.DeclaringType);
+                        object invokeResult = method.Invoke(obj, new object[] { para });
+                        if (invokeResult is bool && !(bool)invokeResult) { return; }
+                        printMsg += "Client.Execute." + msg.ExeType + ".CallBack.Method : " + method.Name + Environment.NewLine;
+                    }
+                    catch (Exception err)
+                    {
+                        Log.Error(err);
+                        return;
                     }
                 }
-                CommitOrRollBackConfirm(msg);
+                else
+                {
+                    printMsg += ("No callback method for execute." + Environment.NewLine);
+                }
+
+                CommitOrRollBackConfirm(msg, ref printMsg);
             }
 
-            private static void CommitOrRollBackConfirm(MQMsg msg)
+            private static void CommitOrRollBackConfirm(MQMsg msg, ref string printMsg)
             {
                 bool isUpdateOK = false;
                 using (Table table = new Table())
@@ -281,11 +285,14 @@ namespace Taurus.Plugin.DistributedTransaction
                     //这边已经删除数据，告诉对方，也可以删除数据了。
                     if (isUpdateOK || isConfirm || (msg.IsDeleteAck.HasValue && msg.IsDeleteAck.Value))
                     {
-                        msg.SetDeleteAsk();
+                        msg.SetDeleteAsk(false);
                         Worker.MQPublisher.Add(msg);
-                        //DTCLog.WriteDebugLine("Client.OnDoTask.IsDeleteAck，让服务端确认及删除掉缓存。");
+                        printMsg += "NextTo :" + msg.QueueName + Environment.NewLine;
+                        printMsg += "-------------------Client " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + " - END------------------------" + Environment.NewLine; ;
+                        return;
                     }
                 }
+                printMsg += "-------------------------------------------------------------------------------" + Environment.NewLine;
             }
 
             #endregion

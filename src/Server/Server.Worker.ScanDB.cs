@@ -140,7 +140,7 @@ namespace Taurus.Plugin.DistributedTransaction
                                 List<MQMsg> msgList = dtSend.ToList<MQMsg>();
                                 foreach (MQMsg msg in msgList)
                                 {
-                                    msg.SetDeleteAsk();
+                                    msg.SetDeleteAsk(true);
                                     if (mQType == MQType.Rabbit)
                                     {
                                         msg.ExChange = DTCConfig.Client.MQ.Rabbit.ConfirmExChange;

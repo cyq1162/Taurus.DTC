@@ -19,10 +19,7 @@ namespace Taurus.Plugin.DistributedTransaction
             {
                 public Table()
                 {
-                    if (!string.IsNullOrEmpty(DTCConfig.Server.Conn))
-                    {
-                        SetInit(this, DTCConfig.Server.TableName, DTCConfig.Server.Conn);
-                    }
+                    SetInit(this, DTCConfig.Server.TableName, DTCConfig.Server.Conn, true);
                 }
                 private long? _ID;
                 /// <summary>

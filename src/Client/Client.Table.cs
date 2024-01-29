@@ -18,10 +18,7 @@ namespace Taurus.Plugin.DistributedTransaction
             {
                 public Table()
                 {
-                    if (!string.IsNullOrEmpty(DTCConfig.Client.Conn))
-                    {
-                        SetInit(this, DTCConfig.Client.TableName, DTCConfig.Client.Conn);
-                    }
+                    SetInit(this, DTCConfig.Client.TableName, DTCConfig.Client.Conn, true);
                 }
                 private long? _ID;
                 /// <summary>
@@ -44,7 +41,7 @@ namespace Taurus.Plugin.DistributedTransaction
                 ///// 队列消息ID
                 ///// </summary>
                 //[Length(36)]
-                
+
                 //public string MsgID
                 //{
                 //    get
@@ -270,7 +267,7 @@ namespace Taurus.Plugin.DistributedTransaction
                     //js.Add("MsgID", this.MsgID);
                     //if (this.TraceID != null)
                     //{
-                        
+
                     //}
                     //if (this.ExChange != null)
                     //{

@@ -311,8 +311,9 @@ namespace Taurus.Plugin.DistributedTransaction
                             //批量发送
                             if (msgList.Count > 0 && MQ.Client.PublishBatch(msgList))
                             {
-                                Log.Print("ScanIO.MQ.Publish.ToRetryExChange :" + msgList.Count + " items.");
-                                DTCConsole.WriteDebugLine("Client.ScanIO.MQ.Publish.ToRetryExChange :" + msgList.Count + " items.");
+                                string printMsg = "Client.ScanIO.MQ.Publish.Retry :" + msgList.Count + " items.";
+                                Log.Print(printMsg);
+                                DTCConsole.WriteDebugLine(printMsg);
                             }
                         }
                     }
