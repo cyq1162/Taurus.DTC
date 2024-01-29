@@ -11,6 +11,10 @@ namespace Taurus.DTC_Demo.ClientControllers
     /// </summary>
     public class ClientController : Taurus.Mvc.Controller
     {
+        public ClientController()
+        {
+            DTCConfig.Client.IsPrintTraceLog = true;
+        }
         /// <summary>
         /// to call commit transation , start https://localhost:5000/client/transation
         /// </summary>
@@ -39,9 +43,9 @@ namespace Taurus.DTC_Demo.ClientControllers
         }
 
 
-        [DTCClientCallBack("OnFail")]
-        [DTCClientCallBack("OnOK")]
-        private void OnCallBack(DTCClientCallBackPara para)
+        [DTCCallBack("OnFail")]
+        [DTCCallBack("OnOK")]
+        private void OnCallBack(DTCCallBackPara para)
         {
             Console.WriteLine("call back : " + para.ExeType + " - " + para.CallBackKey + " - " + para.CallBackContent);
         }

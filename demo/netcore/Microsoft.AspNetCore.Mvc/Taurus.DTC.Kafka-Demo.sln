@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taurus.DTC.Client.Kafka-Demo", "Taurus.DTC.Client.Kafka-Demo\Taurus.DTC.Client.Kafka-Demo.csproj", "{131204A1-2D2C-4B20-BB48-0BA8779239F1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taurus.DTC.Client.Kafka-Demo", "Taurus.DTC.Client.Kafka-Demo\Taurus.DTC.Client.Kafka-Demo.csproj", "{131204A1-2D2C-4B20-BB48-0BA8779239F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taurus.DTC.Server.Kafka-Demo", "Taurus.DTC.Server.Kafka-Demo\Taurus.DTC.Server.Kafka-Demo.csproj", "{4949B1AE-B478-4F1A-8334-2B165AEFAE88}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taurus.DTC.Server.Kafka-Demo", "Taurus.DTC.Server.Kafka-Demo\Taurus.DTC.Server.Kafka-Demo.csproj", "{4949B1AE-B478-4F1A-8334-2B165AEFAE88}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taurus.Plugin.DistributedTransaction.Kafka_NetCore", "..\..\..\src\Taurus.Plugin.DistributedTransaction.Kafka_NetCore.csproj", "{33863329-9629-4465-97C3-75FE4A7987F1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{4949B1AE-B478-4F1A-8334-2B165AEFAE88}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4949B1AE-B478-4F1A-8334-2B165AEFAE88}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4949B1AE-B478-4F1A-8334-2B165AEFAE88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33863329-9629-4465-97C3-75FE4A7987F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33863329-9629-4465-97C3-75FE4A7987F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33863329-9629-4465-97C3-75FE4A7987F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33863329-9629-4465-97C3-75FE4A7987F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

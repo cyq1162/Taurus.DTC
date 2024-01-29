@@ -18,6 +18,10 @@ namespace DTC_Client_Kafka_Demo
     [ApiController]
     public class ClientController : ControllerBase
     {
+        public ClientController()
+        {
+            DTCConfig.Client.IsPrintTraceLog = true;
+        }
         // GET api/values
         [HttpGet]
         [Route("~/client/get")]
@@ -57,27 +61,11 @@ namespace DTC_Client_Kafka_Demo
         }
 
 
-        [DTCClientCallBack("OnFail")]
-        [DTCClientCallBack("OnOK")]
-        [DTCClientCallBack("OnDoOK")]
-        private void OnCallBack(DTCClientCallBackPara para)
+        [DTCCallBack("OnFail")]
+        [DTCCallBack("OnOK")]
+        private void OnCallBack(DTCCallBackPara para)
         {
             Console.WriteLine("call back : " + para.ExeType + " - " + para.CallBackKey + " - " + para.CallBackContent);
-        }
-
-
-        /// <summary>
-        /// to publish a new task , start https://localhost:44370/client/publishtask
-        /// </summary>
-        [HttpGet]
-        [Route("~/client/publishtask")]
-        public string PublishTask()
-        {
-            if (DTC.Client.PublishTaskAsync("I give you some info.", "ToDoTask", "OnDoOK"))
-            {
-                Console.WriteLine("call : DTC.Client.PublishTaskAsync.");
-            }
-            return JsonHelper.OutResult(true, "Publish Task OK.");
         }
     }
 }

@@ -9,6 +9,10 @@ namespace Taurus_DTC_Server_Kafka_Demo_Controllers
     [Route("[controller]")]
     public class ServerController : ControllerBase
     {
+        public ServerController()
+        {
+            DTCConfig.Server.IsPrintTraceLog = true;
+        }
         private static readonly string[] Summaries = new[]
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
@@ -47,8 +51,8 @@ namespace Taurus_DTC_Server_Kafka_Demo_Controllers
         }
 
 
-        [DTCServerSubscribe("OnCreate")]
-        private static bool AnyMethodNameForOnCreateCallBack(DTCServerSubscribePara para)
+        [DTCSubscribe("OnCreate")]
+        private static bool AnyMethodNameForOnCreateCallBack(DTCSubscribePara para)
         {
             para.CallBackContent = "what message you need?";
             Console.WriteLine("call back :" + para.ExeType + " , content :" + para.Content);
@@ -60,14 +64,6 @@ namespace Taurus_DTC_Server_Kafka_Demo_Controllers
                 return true;
             }
             return false;
-        }
-
-        [DTCServerSubscribe("ToDoTask")]
-        private static bool DoSomeTask(DTCServerSubscribePara para)
-        {
-            Console.WriteLine("call :" + para.ExeType + " , content :" + para.Content);
-            para.CallBackContent = "I do ok.";
-            return true;
         }
     }
 }

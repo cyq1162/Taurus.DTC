@@ -7,6 +7,7 @@ builder.Services.AddTaurusDtc();
 var app = builder.Build();
 app.UseTaurusMvc();
 
-app.UseTaurusDtc(StartType.Client);//this example: client and server in the same project.
+app.UseTaurusDtc(DTCStartType.Client);//this example: client and server in the same project.
 
+app.MapGet("/", () => "Hello World!"); // 3 添加路由处理
 app.Run();

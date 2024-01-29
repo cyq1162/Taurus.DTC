@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Taurus.DTC.Kafka" Version="3.2.0.1" />
+    <ProjectReference Include="..\..\..\..\src\Taurus.Plugin.DistributedTransaction.Kafka_NetCore.csproj" />
   </ItemGroup>
 
 </Project>

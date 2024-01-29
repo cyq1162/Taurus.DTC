@@ -9,7 +9,10 @@ namespace DTC_Server_Rabbit_Demo
     /// </summary>
     public class ServerController : Taurus.Mvc.Controller
     {
-
+        public ServerController()
+        {
+             DTCConfig.Server.IsPrintTraceLog = true;
+        }
         /// <summary>
         /// provide a Create api , and it provide a transation , call https://localhost:5001/server/create
         /// </summary>
@@ -29,8 +32,8 @@ namespace DTC_Server_Rabbit_Demo
         }
 
 
-        [DTCServerSubscribe("OnCreate")]
-        private static bool AnyMethodNameForOnCreateCallBack(DTCServerSubscribePara para)
+        [DTCSubscribe("OnCreate")]
+        private static bool AnyMethodNameForOnCreateCallBack(DTCSubscribePara para)
         {
             para.CallBackContent = "what message you need?";
             Console.WriteLine("call back :" + para.ExeType + " , content :" + para.Content);

@@ -13,5 +13,5 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-app.UseTaurusDtc(StartType.Server);
+app.UseTaurusDtc(DTCStartType.Server);
 app.Run();

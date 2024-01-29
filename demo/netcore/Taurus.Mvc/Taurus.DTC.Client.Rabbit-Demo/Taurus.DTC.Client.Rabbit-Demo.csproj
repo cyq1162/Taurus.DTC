@@ -12,8 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Taurus.DTC.RabbitMQ" Version="3.2.1" />
-    <PackageReference Include="Taurus.MVC" Version="3.2.0.4" />
+    <PackageReference Include="Taurus.MVC" Version="3.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Taurus.Plugin.DistributedTransaction.Rabbit_NetCore.csproj" />
   </ItemGroup>
 
 </Project>

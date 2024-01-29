@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taurus.DTC.Client.Rabbit-De
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taurus.DTC.Server.Rabbit-Demo", "Taurus.DTC.Server.Rabbit-Demo\Taurus.DTC.Server.Rabbit-Demo.csproj", "{71493851-C358-44FC-8220-C562E1DF318B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taurus.Plugin.DistributedTransaction_NetCore", "..\..\..\src\Taurus.Plugin.DistributedTransaction_NetCore.csproj", "{8C5F9D36-BDDC-42FD-A9C1-74051A83DB52}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taurus.Plugin.DistributedTransaction.Rabbit_NetCore", "..\..\..\src\Taurus.Plugin.DistributedTransaction.Rabbit_NetCore.csproj", "{826531B0-929E-4845-9499-07F8032AC1DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{71493851-C358-44FC-8220-C562E1DF318B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71493851-C358-44FC-8220-C562E1DF318B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71493851-C358-44FC-8220-C562E1DF318B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8C5F9D36-BDDC-42FD-A9C1-74051A83DB52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8C5F9D36-BDDC-42FD-A9C1-74051A83DB52}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8C5F9D36-BDDC-42FD-A9C1-74051A83DB52}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8C5F9D36-BDDC-42FD-A9C1-74051A83DB52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{826531B0-929E-4845-9499-07F8032AC1DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{826531B0-929E-4845-9499-07F8032AC1DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{826531B0-929E-4845-9499-07F8032AC1DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{826531B0-929E-4845-9499-07F8032AC1DB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -11,7 +11,10 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
-    <PackageReference Include="Taurus.DTC.Kafka" Version="3.2.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Taurus.Plugin.DistributedTransaction.Kafka_NetCore.csproj" />
   </ItemGroup>
 
 </Project>

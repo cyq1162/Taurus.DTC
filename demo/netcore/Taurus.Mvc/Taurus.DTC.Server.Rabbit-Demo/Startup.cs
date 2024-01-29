@@ -27,7 +27,7 @@ namespace DTC_Server_Rabbit_Demo
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseTaurusDtc(StartType.Server);
+            app.UseTaurusDtc(DTCStartType.Server);
             app.UseTaurusMvc();
             app.UseRouting();
 

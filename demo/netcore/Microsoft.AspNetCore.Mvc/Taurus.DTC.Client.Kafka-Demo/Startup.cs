@@ -37,7 +37,7 @@ namespace DTC_Client_Kafka_Demo
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseTaurusDtc(StartType.Server);
+            app.UseTaurusDtc(DTCStartType.Server);
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
