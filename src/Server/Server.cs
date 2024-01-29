@@ -122,9 +122,9 @@ namespace Taurus.Plugin.DistributedTransaction
                     msg.MsgID = item.MsgID;
                     if (item.ConfirmState.HasValue && item.ConfirmState.Value > 0)
                     {
-                        printMsg += (msg.MsgID + " Processed, return directly." + Environment.NewLine);
                         msg.IsFirstAck = false;
                         Worker.MQPublisher.Add(msg);
+                        printMsg += (msg.MsgID + " processed, return directly." + Environment.NewLine);
                         printMsg += "NextTo :" + msg.QueueName + Environment.NewLine;
                         continue;
                     }

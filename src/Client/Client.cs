@@ -288,7 +288,7 @@ namespace Taurus.Plugin.DistributedTransaction
                         msg.SetDeleteAsk(false);
                         Worker.MQPublisher.Add(msg);
                         printMsg += "NextTo :" + msg.QueueName + Environment.NewLine;
-                        printMsg += "-------------------Client " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + " - END------------------------" + Environment.NewLine; ;
+                        printMsg += "-------------------Client " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + " - END------------------------" + Environment.NewLine;
                         return;
                     }
                 }
